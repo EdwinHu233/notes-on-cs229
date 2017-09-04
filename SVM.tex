@@ -13,7 +13,6 @@
 		\end{equation*}			
 	\end{df}
 	
-	
 	\emph{间隔} 有两种理解
 	\begin{df}[Functional margin]
 		对于每个样本来说
@@ -37,7 +36,9 @@
 	\end{df}
 	
 	对于正样本，$ y^{(i)} > 0 $，$ \bm{w^}\intercal \bm{x} + b > 0$，反之亦然。（可以通过给 $ \bm{w} \text{和} b$ 同乘 $ -1 $ 来保证）
-
+	
+	对于 geometric margin 为 $ 1 $ 的样本，称之为 \emph{支持向量（support vector）}。
+	
 	\subsection{Lagrange Duality}
 	这里对凸优化问题作补充。
 	
@@ -74,11 +75,11 @@
 	\subsubsection{Dual Optimization Problem}
 	定义 $ \theta_\mathcal{D}(\bm{w}) = \min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，则
 	\begin{equation}
-	\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\theta_\mathcal{D}(\bm{w})} = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}\min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})}
+	\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\theta_\mathcal{D}(\bm{w})} = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}\min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} \label{dual-opt-problem}
 	\end{equation}
 	称为对偶问题，最优解记为 $ d^* $。
 	
-	\subsubsection{KKT Condition}
+	\subsubsection{KKT Condition}\label{sec-kkt}
 	显然 $ d^* \leq p^* $，并且在一定条件下，$ d^* = p^* $。一种常见的条件是：
 	\begin{itemize}
 		\item $ f $ 和 $ g_i $ 均为凸函数\footnote{凸函数(convex function)：Hessian 矩阵半正定}
@@ -90,32 +91,192 @@
 	\begin{align}
 	\frac{\partial}{\partial \bm{w}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0}\label{kkt1} \\
 	\frac{\partial}{\partial \bm{\beta}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0} \\
-	\alpha_i^* g_i(\bm{w}^*) &=0, \quad i = 1,\ldots,k \\
+	\alpha_i^* g_i(\bm{w}^*) &=0, \quad i = 1,\ldots,k \label{kkt3}\\
 	g(\bm{w}^*) & \leq \bm{0} \\
 	\bm{\alpha}^* & \geq \bm{0}
 	\end{align}
 	以上方程组称为 $ \bm{w}^*, \bm{\alpha}^*, \bm{\beta}^* $ 的 KKT 条件
-
+	
+	注意 \eqref{kkt3} 说明了 $ g(\bm{w}^*) < 0 \to \alpha_i = 0 $。
+	特别地，在 SVM 中只有支持向量对应的 $ \alpha_i $ 可能非零。
+	
 	\subsection{Optimal Margin Classifier}
-	假定样本集线性可分，那么有优化问题
-	\begin{align*}
-		\max_{\gamma, \bm{w}, b}\quad & \frac{\hat{\gamma}}{\| \bm{w} \|} \\
-		\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq \hat{\gamma}, \quad i = 1, \ldots, m
-	\end{align*}
-	求解此优化问题，则得到 \emph{Optimal margin classifier}。
+		\subsubsection{Primal Problem}
+		假定样本集线性可分，那么有优化问题
+		\begin{align*}
+			\max_{\gamma, \bm{w}, b}\quad & \frac{\hat{\gamma}}{\| \bm{w} \|} \\
+			\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq \hat{\gamma}, \quad i = 1, \ldots, m
+		\end{align*}
+		求解此优化问题，则得到 \emph{Optimal margin classifier}。
+		
+		通过同时对 $ \bm{w} $ 和 $ b $ 放缩，可以使 $ \hat{\gamma} = 1 $ 。再做变形可以得到等价的优化问题
+		\begin{align}
+			\min_{\gamma, \bm{w}, b}\quad & \frac{1}{2} \| \bm{w} \| ^2 \\
+			\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq 1, \quad i = 1, \ldots, m
+		\end{align}
+		约束条件为 $ g_i(\bm{w}) = -y^{(i)} (\bm{w^}\intercal \bm{x} + b) + 1 \leq 0 $。
+		
+		\subsubsection{Dual Problem}
+		此问题的 generalized Lagrangian 为
+		\begin{equation}
+			\mathcal{L}(\bm{w}, b, \bm{\alpha}) = \frac{1}{2} \| \bm{w} \| ^2 - \sum_{i=1}^m \alpha_i \left[ y^{(i)} (\bm{w^}\intercal \bm{x}^{(i)} + b) - 1 \right] \label{svm-lag}
+		\end{equation}
+		
+		可以使用 KKT 条件的 \eqref{kkt1} 得到
+		\begin{align}
+			&\bm{w}^* = \sum_i{\alpha_i y^{(i)} \bm{x}^{(i)}} \label{svm-kkt1-1} \\ 
+			&\sum_i{\alpha_i y^{(i)}} = 0 \label{svm-kkt1-2}
+		\end{align}
+		带入到 \eqref{svm-lag} 中，得到
+		\begin{equation*}
+			\mathcal{L}(\bm{w}^*, b^*, \bm{\alpha}) = \sum_i{\alpha_i} - \frac{1}{2} \sum_i \sum_j {\alpha_i \alpha_j y^{(i)} y^{(j)} \left\langle \bm{x}^{(i)} \bm{x}^{(j)} \right\rangle }
+		\end{equation*}
+		
+		所以，对偶问题为
+		\begin{align}
+			\max_{\bm{\alpha}} \quad & W(\bm{\alpha}) = \sum_{i=1}{\alpha_i} - \frac{1}{2} \sum_i \sum_j {\alpha_i \alpha_j y^{(i)} y^{(j)} \left\langle \bm{x}^{(i)} \bm{x}^{(j)} \right\rangle } \\
+			\st & \bm{\alpha} \geq \bm{0} \\
+			& \sum_{i=1}^{m} \alpha_i y^{(i)} = 0
+		\end{align}
+		注意\eqref{dual-opt-problem} 的形式，$ \max \ldots $ 得到了第一个约束条件，
+		$ \min \ldots $ 得到了第二个约束条件（以及被代入 generalized Lagrangian 的 \eqref{svm-kkt1-1}）。
+		
+		\subsubsection{Solution}
+		利用之后的方法对对偶问题求解，得到 $ \bm{\alpha}^* $。代入 \eqref{svm-kkt1-1} 可以解得 $ \bm{w}^* $。
+		
+		根据 $ \bm{w}^* $ 可以解得
+		\begin{equation}
+			b^* = - \frac{1}{2} \left( \max_{i: y^{(i)} = -1} (\bm{w}^*)^\intercal \bm{x}^{(i)} + \min_{i: y^{(i)} = 1} (\bm{w}^*)^\intercal \bm{x}^{(i)} \right) \label{svm-commonly-solving-b}
+		\end{equation}
+		\begin{pf}
+			对于支持向量，有
+			\begin{align*}
+				\max_{i: y^{(i)} = -1} (\bm{w}^*)^\intercal \bm{x}^{(i)} + b & = -1 \\
+				\min_{i: y^{(i)} = 1} (\bm{w}^*)^\intercal \bm{x}^{(i)} + b & = 1
+			\end{align*}
+			两式相加即可。
+		\end{pf}
+		
+		解出参数 $ \bm{w} $ 和 $ b $ 之后，就可以对于输入 $ \bm{x} $ 输出预测值 $ y $ 了。
+		由 \eqref{svm-kkt1-1} 得
+		\begin{align}
+			\bm{w}^\intercal \bm{x} + b &= \left( \sum_i \alpha_i y^{(i)} \bm{x}^{(i)} \right)^\intercal \bm{x} + b \\
+			&= \sum_i \alpha_i y^{(i)} \left\langle \bm{x}^{(i)}, \bm{x} \right\rangle + b
+		\end{align}
+		对于此式，注意两点：
+		\begin{itemize}
+			\item 由 \ref{sec-kkt} 中的结论，只有支持向量对应的 $ \alpha_i $ 可能非零。支持向量的个数非常少，故预测的代价很小
+			\item 此式整理为了内积的形式，内积可以用核函数代替（对偶问题也一样）
+		\end{itemize}
+		
+	\subsection{Kernels}
+	\begin{df}[Feature mapping]
+		我们称原始输入的数据为样本的 attributes，对 attributes 映射得到 features。这样的映射称为 feature mapping，记作 $ \phi(\bm{x}) $
+	\end{df}
+	例如，设房价是一个标量 $ x $，我们可以映射得到 $ \phi(x) = {\left( x, x^2, x^3  \right)} ^\intercal $
 	
-	通过同时对 $ \bm{w} $ 和 $ b $ 放缩，可以使 $ \hat{\gamma} = 1 $ 。再做变形可以得到等价的优化问题
-	\begin{align}
-		\min_{\gamma, \bm{w}, b}\quad & \frac{1}{2} \| \bm{w} \| ^2 \\
-		\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq 1, \quad i = 1, \ldots, m
-	\end{align}
-	约束条件为 $ g_i(\bm{w}) = -y^{(i)} (\bm{w^}\intercal \bm{x} + b) + 1 \leq 0 $。
+	\begin{df}[Kernel method]
+		\begin{equation*}
+			K(\bm{x}, \bm{z}) = \phi(\bm{x})^\intercal \phi(\bm{z})
+		\end{equation*}
+	\end{df}
+	我们可以用“核函数”来代替向量内积。
 	
-	此问题的 generalized Lagrangian 为
-	\begin{equation}
-		\mathcal{L}(\bm{w}, b, \bm{\alpha}) = \frac{1}{2} \| \bm{w} \| ^2 - \sum_{i=1}^m \alpha_i \left[ y^{(i)} (\bm{w^}\intercal \bm{x}^{(i)} + b) - 1 \right]
-	\end{equation}
-	可以使用 KKT 条件的 \eqref{kkt1} 得到
-	\begin{align}
-		\bm{w} = 
-	\end{align}
+	直觉上，内积表示了两个向量的“相似”程度：越是接近平行的向量，内积的绝对值越大；越是接近正交的向量，内积的绝对值越小。
+	Kernel methods 也应该具有类似的特征。
+	
+		\subsubsection{Common kernels}
+		常见的 kernel 有：
+		
+		\begin{df}[Polynomial kernel]
+			\begin{equation}
+				K(\bm{x}, \bm{z}) = ( \bm{x}^\intercal \bm{z} + c )^d
+			\end{equation}
+		\end{df}
+		这个 kernel 将 $ n $ 维向量映射到 $ \binom{n+d}{d} $ 的 feature space 中。换言之，将原本 $ O(n^d) $ 的复杂度降低到 $ O(n) $。
+		
+		\begin{df}[Gaussian kernel]
+			\begin{equation}
+				K(\bm{x}, \bm{z}) = \exp\left( - \frac{ \| \bm{x} - \bm{z} \|^2 }{2 \sigma^2} \right)
+			\end{equation}
+		\end{df}
+		这个 kernel 将 $ n $ 维向量映射到无穷维的 feature space 中。复杂度为 $ O(n) $
+		
+		\subsubsection{Validation}
+		\begin{df}[Kernel matrix]
+			设 $ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 为数据集，$ K $ 是一个合法的 kernel（即 $ \exists \phi: \ldots $ ），
+			则对应的 kernel matrix 定义为
+			\begin{equation*}
+				K_{i,j} = K(\bm{x}^i, \bm{x}^j)
+			\end{equation*}
+		\end{df}
+		
+		可证 $ K $ 是对称半正定的
+		\begin{pf}
+			显然 $ K $ 是对称的。接下来只需证 $ \forall \bm{z}: \bm{z}^\intercal K \bm{z} \geq 0 $ 即可：
+			\begin{align*}
+				\bm{z}^\intercal K \bm{z} &= \sum_i \sum_j z_i K_{ij} z_j \\
+				&= \sum_i \sum_j z_i \phi(\bm{x}^{(i)})^\intercal \phi(\bm{x}^{(j)}) z_j \\
+				&= \sum_i \sum_j \sum_k z_i \phi_k(\bm{x}^{(i)}) \phi_k(\bm{x}^{(j)}) z_j \\
+				&= \sum_k \sum_i \sum_j (z_i \phi_k(\bm{x}^{(i)})) (z_j \phi_k(\bm{x}^{(j)})) \\
+				&= \sum_k \sum_i ( z_i \phi_k(\bm{x}^{(i)}) )^2 \\
+				&\geq 0
+			\end{align*}
+		\end{pf}
+		
+		事实上，若 $ K $ 是对称半正定的，则反过来也可证 $ K $ 是一个合法的 kernel。即以下定理：
+		\begin{thm}
+			设 $ K: \mathbb{R}^n \times \mathbb{R}^n \to \mathbb{R} $，$ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 为 $ \mathbb{R}^n $ 上的数据集，则
+			\[ K \text{对称半正定} \iff K \text{是合法的 kernel} \]
+		\end{thm}
+		
+	\subsection{$ l1 $ Norm Soft Margin SVM}
+		\subsubsection{Primal Problem}
+		有时数据集不是严格线性可分的，而是存在个别异常的点。我们可以允许部分点的 $ \gamma^{(i)} < 1 $ （甚至为负）。
+		一种方法是引入 $ l1 $ regularization。
+		\begin{align*}
+			\min_{\bm{w}, b, \bm{\xi}} \quad & \frac{1}{2} \| \bm{w} \|^2 + C \sum_i \xi_i \\
+			\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq 1 - \xi_i, \quad i = 1, \ldots, m \\
+			& \xi_i \geq 0, \quad i = 1, \ldots, m
+		\end{align*}
+		其中 $ \xi_i $ 为允许的误差。（$ \bm{w}, b, \bm{xi} $ 都是自变量）
+		
+		\subsubsection{Dual Problem}
+		Generalized Lagrangian 为
+		\begin{equation*}
+			\mathcal{L}( \bm{w}, b, \bm{xi}, \bm{\alpha}, \bm{r} ) = \frac{1}{2} \| \bm{w} \|^2 + C \sum_i \xi_i - \sum_i \alpha_i \left[ y^{(i)} (\bm{w^}\intercal \bm{x} + b) - 1 + \xi_i \right] - \sum_i r_i \xi_i
+		\end{equation*}
+		类似于普通的 SVM，由 \eqref{kkt1} 得
+		\begin{align}
+			\sum_i \alpha_i y^{(i)} \bm{x}^{(i)} &= \bm{w}^* \\
+			\sum_i \alpha_i y^{(i)} &= 0 \\
+			\alpha_i + r_i &= C
+		\end{align}
+		代入上式得
+		\begin{align}
+			\max_{\bm{\alpha}} \quad & W(\bm{\alpha}) = \sum_i \alpha_i - \frac{1}{2} \sum_i \sum_j \alpha_i \alpha_j y^{(i)} y^{(j)} \left\langle \bm{x}^{(i)} , \bm{x}^{(j)} \right\rangle \\
+			\st & 0 \leq \alpha_i \leq C \\
+			& \sum_i \alpha_i y^{(i)} = 0
+		\end{align}
+		
+		\subsubsection{Solution}
+		与普通的 SVM 类似，求解对偶问题得到 $ \bm{\alpha}^* $ 后，即可求得 $ \bm{w}^* $。
+		与 \eqref{svm-commonly-solving-b} 不同的是，此时支持向量不再是 functional margin 最小的点，故 $ b^* $ 的求解不再适用此式。
+		%TODO
+		
+		\subsubsection{KKT Dual-complimentary Conditions}
+		对 KKT 条件稍作变形可得
+		\begin{align*}
+			\alpha_i \geq 0, \quad & r_i \geq 0, \quad \alpha_i + r_i = C \\
+			\xi_i \geq 0, \quad & y^{(i)} ( \bm{w}^\intercal \bm{x}^{(i)} + b ) \geq 1 - \xi_i \\
+			r_i \xi_i = 0, \quad & \alpha \left( \bm{w}^\intercal \bm{x}^{(i)} + b - (1-\xi_i) \right) = 0
+		\end{align*}
+		易得
+		\begin{align}
+			\alpha_i = 0 & \To y^{(i)} ( \bm{w}^\intercal \bm{x}^{(i)} + b ) \geq 1 \label{eq:svm-soft-margin-kkt1} \\ 
+			\alpha_i = C & \To y^{(i)} ( \bm{w}^\intercal \bm{x}^{(i)} + b ) \leq 1 \label{eq:svm-soft-margin-kkt2} \\
+			0 \leq \alpha_i \leq C & \To y^{(i)} ( \bm{w}^\intercal \bm{x}^{(i)} + b ) = 1\label{eq:svm-soft-margin-kkt3}		
+		\end{align}
+		
+		其中 \eqref{eq:svm-soft-margin-kkt1} 是普通样本（或支持向量）的情况，\eqref{eq:svm-soft-margin-kkt2} 是异常样本（或支持向量）的情况，
+		\eqref{eq:svm-soft-margin-kkt3} 是支持向量的情况。
