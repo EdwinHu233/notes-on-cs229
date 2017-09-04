@@ -1,12 +1,121 @@
 \section{Support Vector Machine}
 	SVM 的主要思想是用一个超平面(hyperplane) $ \bm{w}^\intercal \bm{x} + b = 0 $ 分隔样本，使正样本与负样本的\emph{间隔}尽可能大。
 	
-	定义 hypothesis function 如下：
-	\begin{equation}
-		h_{\bm{w},\bm{b}} (\bm{x}) = g( \bm{w}^\intercal \bm{x} + b ) = 
-		\begin{cases}
-			1 & \bm{w}^\intercal \bm{x} + b \geq 0 \\
-			-1 & \bm{w}^\intercal \bm{x} + b < 0
-		\end{cases}
-	\end{equation}
+	\subsection{Notation}
+	目标为
+	\begin{df}[Hypothesis function]
+		\begin{equation*}
+			h_{\bm{w},\bm{b}} (\bm{x}) = g( \bm{w}^\intercal \bm{x} + b ) = 
+			\begin{cases}
+				1 	& \bm{w}^\intercal \bm{x} + b \geq 0 \\
+				-1 	& \bm{w}^\intercal \bm{x} + b < 0
+			\end{cases}
+		\end{equation*}			
+	\end{df}
 	
+	
+	\emph{间隔} 有两种理解
+	\begin{df}[Functional margin]
+		对于每个样本来说
+		\begin{equation*}
+			\hat{\gamma}^{(i)} = y^{(i)} (\bm{w^}\intercal \bm{x} + b)
+		\end{equation*}
+		对于整个样本集来说
+		\begin{equation*}
+			\hat{\gamma} = \min_{i=1,\ldots,m}{\hat{\gamma}^{(i)}}
+		\end{equation*}
+	\end{df}
+	\begin{df}[Geometric margin]
+		对于每个样本来说
+		\begin{equation*}
+			\gamma = y^{(i)} (\frac{\bm{w^}\intercal}{\| \bm{w} \|} \bm{x} + \frac{b}{\| \bm{w} \|})			
+		\end{equation*}
+		对于整个样本集来说
+			\begin{equation*}
+				\gamma = \min_{i=1,\ldots,m}{\gamma^{(i)}}
+			\end{equation*}	
+	\end{df}
+	
+	对于正样本，$ y^{(i)} > 0 $，$ \bm{w^}\intercal \bm{x} + b > 0$，反之亦然。（可以通过给 $ \bm{w} \text{和} b$ 同乘 $ -1 $ 来保证）
+
+	\subsection{Lagrange Duality}
+	这里对凸优化问题作补充。
+	
+	设\emph{原优化问题（primal optimization problem）} 为
+	\begin{align*}
+	\min_w\quad & f(\bm{w}) \\
+	\st & \bm{g}(\bm{w}) \leq \bm{0}, \quad \bm{g} \in \mathbb{R}^k \\
+	& \bm{h}(\bm{w}) = \bm{0}, \quad \bm{h} \in \mathbb{R}^l
+	\end{align*}
+	
+	\begin{df}[Generalized Lagrangian]
+		\begin{equation}
+		\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta}) = f(\bm{w}) + \bm{\alpha}^\intercal \bm{g}(\bm{w}) + \bm{\beta}^\intercal \bm{h}(\bm{w})
+		\end{equation}
+		其中，$ \bm{\alpha} \geq \bm{0} $
+	\end{df}
+	
+	\subsubsection{Primal Optimization Problem}
+	定义 $ \theta_\mathcal{P}(\bm{w}) = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，显然有
+	\begin{equation*}
+	\theta_\mathcal{P}(\bm{w}) = 
+	\begin{cases}
+	f(\bm{w}) & \bm{w} \text{满足约束时} \\
+	\infty & \text{其他}
+	\end{cases}
+	\end{equation*}
+	
+	所以有
+	\begin{equation}
+	\min_{\bm{w}}{\theta_\mathcal{P}(\bm{w})} = \min_{\bm{w}}{\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})}}
+	\end{equation}
+	就是原优化问题，最优解记为 $ p^* $。
+	
+	\subsubsection{Dual Optimization Problem}
+	定义 $ \theta_\mathcal{D}(\bm{w}) = \min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，则
+	\begin{equation}
+	\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\theta_\mathcal{D}(\bm{w})} = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}\min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})}
+	\end{equation}
+	称为对偶问题，最优解记为 $ d^* $。
+	
+	\subsubsection{KKT Condition}
+	显然 $ d^* \leq p^* $，并且在一定条件下，$ d^* = p^* $。一种常见的条件是：
+	\begin{itemize}
+		\item $ f $ 和 $ g_i $ 均为凸函数\footnote{凸函数(convex function)：Hessian 矩阵半正定}
+		\item $ h_i $ 均为仿射函数\footnote{仿射函数（affine function）：形如 $ f(\bm{x}) = \bm{a}^\intercal \bm{x} + b $}
+		\item $ g $ 严格可满足\footnote{严格可满足（strictly feasible）：$ \exists \bm{w}: g(\bm{w}) \leq \bm{0} $}
+	\end{itemize}
+	
+	此时，设 $ p^* = d^* = \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) $，则 $ \bm{w}^*, \bm{\alpha}^*, \bm{\beta}^* $ 满足
+	\begin{align}
+	\frac{\partial}{\partial \bm{w}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0}\label{kkt1} \\
+	\frac{\partial}{\partial \bm{\beta}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0} \\
+	\alpha_i^* g_i(\bm{w}^*) &=0, \quad i = 1,\ldots,k \\
+	g(\bm{w}^*) & \leq \bm{0} \\
+	\bm{\alpha}^* & \geq \bm{0}
+	\end{align}
+	以上方程组称为 $ \bm{w}^*, \bm{\alpha}^*, \bm{\beta}^* $ 的 KKT 条件
+
+	\subsection{Optimal Margin Classifier}
+	假定样本集线性可分，那么有优化问题
+	\begin{align*}
+		\max_{\gamma, \bm{w}, b}\quad & \frac{\hat{\gamma}}{\| \bm{w} \|} \\
+		\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq \hat{\gamma}, \quad i = 1, \ldots, m
+	\end{align*}
+	求解此优化问题，则得到 \emph{Optimal margin classifier}。
+	
+	通过同时对 $ \bm{w} $ 和 $ b $ 放缩，可以使 $ \hat{\gamma} = 1 $ 。再做变形可以得到等价的优化问题
+	\begin{align}
+		\min_{\gamma, \bm{w}, b}\quad & \frac{1}{2} \| \bm{w} \| ^2 \\
+		\st & y^{(i)} (\bm{w^}\intercal \bm{x} + b) \geq 1, \quad i = 1, \ldots, m
+	\end{align}
+	约束条件为 $ g_i(\bm{w}) = -y^{(i)} (\bm{w^}\intercal \bm{x} + b) + 1 \leq 0 $。
+	
+	此问题的 generalized Lagrangian 为
+	\begin{equation}
+		\mathcal{L}(\bm{w}, b, \bm{\alpha}) = \frac{1}{2} \| \bm{w} \| ^2 - \sum_{i=1}^m \alpha_i \left[ y^{(i)} (\bm{w^}\intercal \bm{x}^{(i)} + b) - 1 \right]
+	\end{equation}
+	可以使用 KKT 条件的 \eqref{kkt1} 得到
+	\begin{align}
+		\bm{w} = 
+	\end{align}
