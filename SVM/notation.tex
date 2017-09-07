@@ -1,0 +1,38 @@
+\subsection{Notation}
+	目标为
+	\begin{df}[Hypothesis function]
+		\begin{equation*}
+			h_{\bm{w},\bm{b}} (\bm{x}) = g( \bm{w}^\intercal \bm{x} + b ) = 
+			\begin{cases}
+				1 	& \bm{w}^\intercal \bm{x} + b \geq 0 \\
+				-1 	& \bm{w}^\intercal \bm{x} + b < 0
+			\end{cases}
+		\end{equation*}			
+	\end{df}
+	
+	\emph{间隔} 有两种理解
+	\begin{df}[Functional margin]
+		对于每个样本来说
+		\begin{equation*}
+			\hat{\gamma}^{(i)} = y^{(i)} (\bm{w^}\intercal \bm{x} + b)
+		\end{equation*}
+		对于整个样本集来说
+		\begin{equation*}
+			\hat{\gamma} = \min_{i=1,\ldots,m}{\hat{\gamma}^{(i)}}
+		\end{equation*}
+	\end{df}
+	\begin{df}[Geometric margin]
+		对于每个样本来说
+		\begin{equation*}
+			\gamma = y^{(i)} (\frac{\bm{w^}\intercal}{\| \bm{w} \|} \bm{x} + \frac{b}{\| \bm{w} \|})			
+		\end{equation*}
+		对于整个样本集来说
+			\begin{equation*}
+				\gamma = \min_{i=1,\ldots,m}{\gamma^{(i)}}
+			\end{equation*}	
+	\end{df}
+	
+	对于正样本，$ y^{(i)} > 0 $，$ \bm{w^}\intercal \bm{x} + b > 0$，反之亦然。（可以通过给 $ \bm{w} \text{和} b$ 同乘 $ -1 $ 来保证）
+	
+	对于 geometric margin 为 $ 1 $ 的样本，称之为 \emph{支持向量（support vector）}。
+	

@@ -1,0 +1,61 @@
+\subsection{Lagrange Duality}
+	这里对凸优化问题作补充。
+	
+	设\emph{原优化问题（primal optimization problem）} 为
+	\begin{align*}
+	\min_w\quad & f(\bm{w}) \\
+	\st & \bm{g}(\bm{w}) \leq \bm{0}, \quad \bm{g} \in \mathbb{R}^k \\
+	& \bm{h}(\bm{w}) = \bm{0}, \quad \bm{h} \in \mathbb{R}^l
+	\end{align*}
+	
+	\begin{df}[Generalized Lagrangian]
+		\begin{equation}
+		\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta}) = f(\bm{w}) + \bm{\alpha}^\intercal \bm{g}(\bm{w}) + \bm{\beta}^\intercal \bm{h}(\bm{w})
+		\end{equation}
+		其中，$ \bm{\alpha} \geq \bm{0} $
+	\end{df}
+	
+	\subsubsection{Primal Optimization Problem}
+		定义 $ \theta_\mathcal{P}(\bm{w}) = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，显然有
+		\begin{equation*}
+		\theta_\mathcal{P}(\bm{w}) = 
+		\begin{cases}
+		f(\bm{w}) & \bm{w} \text{满足约束时} \\
+		\infty & \text{其他}
+		\end{cases}
+		\end{equation*}
+		
+		所以有
+		\begin{equation}
+		\min_{\bm{w}}{\theta_\mathcal{P}(\bm{w})} = \min_{\bm{w}}{\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})}}
+		\end{equation}
+		就是原优化问题，最优解记为 $ p^* $。
+		
+	\subsubsection{Dual Optimization Problem}
+		定义 $ \theta_\mathcal{D}(\bm{w}) = \min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，则
+		\begin{equation}
+		\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\theta_\mathcal{D}(\bm{w})} = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}\min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} \label{dual-opt-problem}
+		\end{equation}
+		称为对偶问题，最优解记为 $ d^* $。
+		
+	\subsubsection{KKT Condition}\label{sec-kkt}
+		显然 $ d^* \leq p^* $，并且在一定条件下，$ d^* = p^* $。一种常见的条件是：
+		\begin{itemize}
+			\item $ f $ 和 $ g_i $ 均为凸函数\footnote{凸函数(convex function)：Hessian 矩阵半正定}
+			\item $ h_i $ 均为仿射函数\footnote{仿射函数（affine function）：形如 $ f(\bm{x}) = \bm{a}^\intercal \bm{x} + b $}
+			\item $ g $ 严格可满足\footnote{严格可满足（strictly feasible）：$ \exists \bm{w}: g(\bm{w}) \leq \bm{0} $}
+		\end{itemize}
+		
+		此时，设 $ p^* = d^* = \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) $，则 $ \bm{w}^*, \bm{\alpha}^*, \bm{\beta}^* $ 满足
+		\begin{align}
+		\frac{\partial}{\partial \bm{w}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0}\label{kkt1} \\
+		\frac{\partial}{\partial \bm{\beta}} \mathcal{L}(\bm{w}^*, \bm{\alpha}^*, \bm{\beta}^*) &= \bm{0} \\
+		\alpha_i^* g_i(\bm{w}^*) &=0, \quad i = 1,\ldots,k \label{kkt3}\\
+		g(\bm{w}^*) & \leq \bm{0} \\
+		\bm{\alpha}^* & \geq \bm{0}
+		\end{align}
+		以上方程组称为 $ \bm{w}^*, \bm{\alpha}^*, \bm{\beta}^* $ 的 KKT 条件
+		
+		注意 \eqref{kkt3} 说明了 $ g(\bm{w}^*) < 0 \to \alpha_i = 0 $。
+		特别地，在 SVM 中只有支持向量对应的 $ \alpha_i $ 可能非零。
+		

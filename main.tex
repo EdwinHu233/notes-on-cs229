@@ -3,26 +3,27 @@
 	\setmainfont{Inziu Roboto SC}
 \usepackage[indentfirst]{xeCJK}
 	\setCJKmainfont{Inziu Roboto SC}
-\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=black]{hyperref}
-\usepackage{bm}
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage{amsthm}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=black, pdfencoding=unicode, psdextra]{hyperref}
+\usepackage{bm,amsmath,amsfonts,amssymb,amsthm,a4wide,bookmark}
 
 \theoremstyle{definition}
 \newtheorem*{df}{定义}
-
-\theoremstyle{proof}
-\newtheorem*{pf}{证明}
 \theoremstyle{plain}
 \newtheorem{thm}{定理}
 
 \newcommand{\st}{s.t. \quad}
 \newcommand{\To}{\Rightarrow}
+\newcommand\inner[2]{\left\langle #1, #2 \right\rangle}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\old}{\text{old}}
+\newcommand{\new}{\text{new}}
+
 
 \title{CS229 笔记}
 \author{Jingbo Hu}
 
 \begin{document}
 	\maketitle
+	\tableofcontents
 	\include{SVM}
 \end{document}

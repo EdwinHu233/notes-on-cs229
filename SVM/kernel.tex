@@ -1,0 +1,61 @@
+\subsection{Kernels}
+	\begin{df}[Feature mapping]
+		我们称原始输入的数据为样本的 attributes，对 attributes 映射得到 features。这样的映射称为 feature mapping，记作 $ \phi(\bm{x}) $
+	\end{df}
+	例如，设房价是一个标量 $ x $，我们可以映射得到 $ \phi(x) = {\left( x, x^2, x^3  \right)} ^\intercal $
+	
+	\begin{df}[Kernel method]
+		\begin{equation*}
+			K(\bm{x}, \bm{z}) = \phi(\bm{x})^\intercal \phi(\bm{z})
+		\end{equation*}
+	\end{df}
+	我们可以用“核函数”来代替向量内积。
+	
+	直觉上，内积表示了两个向量的“相似”程度：越是接近平行的向量，内积的绝对值越大；越是接近正交的向量，内积的绝对值越小。
+	Kernel methods 也应该具有类似的特征。
+	
+	\subsubsection{Common kernels}
+		常见的 kernel 有：
+		
+		\begin{df}[Polynomial kernel]
+			\begin{equation}
+				K(\bm{x}, \bm{z}) = ( \bm{x}^\intercal \bm{z} + c )^d
+			\end{equation}
+		\end{df}
+		这个 kernel 将 $ n $ 维向量映射到 $ \binom{n+d}{d} $ 的 feature space 中。换言之，将原本 $ O(n^d) $ 的复杂度降低到 $ O(n) $。
+		
+		\begin{df}[Gaussian kernel]
+			\begin{equation}
+				K(\bm{x}, \bm{z}) = \exp\left( - \frac{ \| \bm{x} - \bm{z} \|^2 }{2 \sigma^2} \right)
+			\end{equation}
+		\end{df}
+		这个 kernel 将 $ n $ 维向量映射到无穷维的 feature space 中。复杂度为 $ O(n) $
+		
+	\subsubsection{Validation}
+		\begin{df}[Kernel matrix]
+			设 $ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 为数据集，$ K $ 是一个合法的 kernel（即 $ \exists \phi: \ldots $ ），
+			则对应的 kernel matrix 定义为
+			\begin{equation*}
+				K_{i,j} = K(\bm{x}^i, \bm{x}^j)
+			\end{equation*}
+		\end{df}
+		
+		可证 $ K $ 是对称半正定的
+		\begin{proof}
+			显然 $ K $ 是对称的。接下来只需证 $ \forall \bm{z}: \bm{z}^\intercal K \bm{z} \geq 0 $ 即可：
+			\begin{align*}
+				\bm{z}^\intercal K \bm{z} &= \sum_i \sum_j z_i K_{ij} z_j \\
+				&= \sum_i \sum_j z_i \phi(\bm{x}^{(i)})^\intercal \phi(\bm{x}^{(j)}) z_j \\
+				&= \sum_i \sum_j \sum_k z_i \phi_k(\bm{x}^{(i)}) \phi_k(\bm{x}^{(j)}) z_j \\
+				&= \sum_k \sum_i \sum_j (z_i \phi_k(\bm{x}^{(i)})) (z_j \phi_k(\bm{x}^{(j)})) \\
+				&= \sum_k \sum_i ( z_i \phi_k(\bm{x}^{(i)}) )^2 \\
+				&\geq 0
+			\end{align*}
+		\end{proof}
+		
+		事实上，若 $ K $ 是对称半正定的，则反过来也可证 $ K $ 是一个合法的 kernel。即以下定理：
+		\begin{thm}
+			设 $ K: \mathbb{R}^n \times \mathbb{R}^n \to \mathbb{R} $，$ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 为 $ \mathbb{R}^n $ 上的数据集，则
+			\[ K \text{对称半正定} \iff K \text{是合法的 kernel} \]
+		\end{thm}
+		

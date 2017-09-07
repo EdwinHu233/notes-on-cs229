@@ -1,0 +1,85 @@
+\subsection{SMO}
+	SMO (sequential minimal optimization) 算法利用了 coordinate ascent 的思想。
+	每次迭代对 \eqref{eq:smo-obj} 中 $ \bm{\alpha} $ 的某两个分量 $ \alpha_i, \alpha_j $ 优化目标函数。
+	Soft margin classifier 的（对偶）优化问题如下：
+	\begin{align}
+	\max_{\bm{\alpha}} \quad & W(\bm{\alpha}) = \sum_i \alpha_i - \frac{1}{2} \sum_i \sum_j \alpha_i \alpha_j y^{(i)} y^{(j)} \left\langle \bm{x}^{(i)} , \bm{x}^{(j)} \right\rangle \label{eq:smo-obj}\\
+	\st & 0 \leq \alpha_i \leq C \label{eq:smo-constrain1}\\
+	& \sum_i \alpha_i y^{(i)} = 0 \label{eq:smo-constrain2}
+	\end{align}
+	
+	\subsubsection{Solving $ \alpha $}
+		假设在这次迭代中要对 $ \alpha_1, \alpha_2 $ 优化 \eqref{eq:smo-obj}
+		（我们之后再讨论每次迭代应该怎么选取要优化的分量)。
+		
+		
+		设 $ \zeta = - \sum_{3}^{m} \alpha_i y^{(i)} $，由 \eqref{eq:smo-constrain2}知 $ \alpha_1 y^{(1)} + \alpha_2 y^{(2)} = \zeta $。
+		注意 $ y^{(1)} = \pm 1$，令 $ s = y^{(1)} y^{(2)} $ ，则
+		\begin{equation}
+			\alpha_1 = \zeta - s \alpha_2 \label{eq:smo-a1-and-a2}
+		\end{equation}
+		
+		将 \eqref{eq:smo-a1-and-a2} 代入 \eqref{eq:smo-obj} 中得到，并记 $ K_{ij} = \inner{\bm{x}^{(i)}} {\bm{x}^{(j)}}  $，得到
+		\begin{multline}
+			W(\bm{\alpha}) = \alpha_1 + \alpha_2 - \frac{1}{2} \left( K_{11}\alpha_1^2 + K_{22}\alpha_2^2 + 2s\alpha_1\alpha_2 K_{12} \right) \\
+			- (\alpha_1 y^{(1)} \bm{x}^{(1)} + \alpha_2 y^{(2)} \bm{x}^{(2)})^\intercal \sum_{i=3}^{m} \alpha_i y^{(i)} \bm{x}^{(i)} + \text{const}
+		\end{multline}
+		
+		设 $ u_j^\old = (\bm{w}^\old)^\intercal \bm{x}^{(j)} + b^\old $ （即上次迭代后的对于 $ \bm{x}^{(j)} $ 的预测值）。
+		注意到 \eqref{eq:soft-margin-kkt1} 以及 $ \forall i \geq 3: \alpha_i = \alpha_i^\old $，设
+		\begin{align*}
+			v_j &= (\bm{x}^{(j)})^\intercal \sum_{i=3}^{m} \alpha_i y^{(i)} \bm{x}^{(i)} \\
+			&= (\bm{x}^{(j)})^\intercal ( \bm{w}^\old - \alpha_1^\old y^{(1)} \bm{x}^{(1)} - \alpha_2^\old y^{(2)} \bm{x}^{(2)}) \\
+			&= u_j^\intercal + b^\intercal - (\bm{x}^{(j)})^\intercal ( \alpha_1^\old y^{(1)} \bm{x}^{(1)} + \alpha_1^\old y^{(1)} \bm{x}^{(1)} ) \numberthis \label{eq:smo-vj}
+		\end{align*}
+		
+		将 \eqref{eq:smo-a1-and-a2} 代入 $ W(\bm{\alpha}) $ 中，化简得：
+		\begin{equation}
+			W(\bm{\alpha}) = \frac{1}{2} (2K_{12} - K_{11} - K_{22}) \alpha_2^2 \\
+			+ (\zeta s (K_{11} - K_{12}) + y^{(2)} (v_1 - v_2) + 1-s) \alpha_2 + \text{const}
+		\end{equation}
+		是一个关于 $ \alpha_2 $ 的二次多项式：
+		\begin{itemize}
+			\item 设 $ \eta = 2K_{12} - K_{11} - K_{22} $，则二次项的系数为 $ \frac{1}{2} \eta $。 
+			\item 设 $ E_j^\old = u_j - y^{(j)} $，即上次迭代后对于 $ \bm{x}^{(j)} $ 的预测误差。一次项的系数代入 \eqref{eq:smo-vj} 可以化简为 $ y^{(2)} \left( E_1^\old - E_2^\old \right) - \eta \alpha_2^\old $。
+		\end{itemize}
+		
+		所以，二次多项式最优解为
+		\begin{equation}
+			\alpha_2^\text{new, unclipped} = \alpha_2^\old - \frac{ E_1^\old - E_2^\old }{\eta} y^{(2)}
+		\end{equation}
+		
+		但是仍需要注意约束条件 \eqref{eq:smo-constrain1} 和 \eqref{eq:smo-constrain2}。 
+		$ \alpha_1, \alpha_2 $ 所处的限制区域是一条直线被正方形裁剪后得到的线段。设 $ \alpha_2 \in [L, H]$，则
+		\begin{itemize}
+			\item 当 $ y^{(1)} \neq y^{(2)} $ 时，$ L = \max(0, \alpha_2 - \alpha_1), \quad H = \min(C, C + \alpha_2 - \alpha_1) $ 
+			\item 当 $ y^{(1)} = y^{(2)} $ 时，$ L = \max(0, \alpha_1 + \alpha_2 - C), \quad H = \min(C, \alpha_1 + \alpha_2) $
+		\end{itemize}
+		
+		所以最终的 $ \alpha_2^\new $ 为
+		\begin{equation*}
+			\alpha_2^\new = 
+			\begin{cases}
+				H &\qquad \alpha_2^\text{new, unclipped} > H \\
+				\alpha_2^\text{new, unclipped} &\qquad \alpha_2^\text{new, unclipped} \in [L, H] \\
+				L &\qquad \alpha_2^\text{new, unclipped} < L
+			\end{cases}
+		\end{equation*}
+		代入 \eqref{eq:smo-a1-and-a2} 即可得到 $ \alpha_1^\new $。
+		
+	\subsubsection{Updating} 
+		在求出 $ \bm{\alpha}^\new $ 之后，我们要更新 $ \bm{w}, b $。
+		
+		由于只有 $ \alpha_1, \alpha_2 $ 发生了改变，所以
+		\begin{equation}
+			\Delta\bm{w} = \Delta\alpha_1 y^{(1)} \bm{x}^{(1)} + \Delta\alpha_2 y^{(2)} \bm{x}^{(2)} \label{eq:smo-delta-w}
+		\end{equation}
+		
+		假设 $ \alpha_1^\new \in (0, C) $，则由 \eqref{eq:svm-soft-margin-kkt3} 知新的预测值应该为 $ y^{(1)} $，即预测误差为 $ 0 $。所以有
+		\begin{align*}
+			E_1^\new &= \Delta E_1 + E_1^\old = 0 \\
+			- E_1^\old &= \Delta E_1 = {\Delta\bm{w}}^\intercal \bm{x}^{(1)} + \Delta b \\
+			\Delta b &= - ( E_1^\old + {\Delta\bm{w}}^\intercal \bm{x}^{(1)} ) \numberthis\label{eq:smo-delta-b}
+		\end{align*}
+		若 $ \alpha_2^\new \in (0, C) $，也能得到相似结论。若 $ \alpha_1, \alpha_2 $ 都不满足这样的条件，则取 $ \Delta b $ 为以上二者平均值。
+		
