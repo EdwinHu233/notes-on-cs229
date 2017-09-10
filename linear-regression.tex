@@ -1,0 +1,76 @@
+\section{Linear Regression}
+	设样本特征为 $ n $ 维，自变量为 $ \bm{x} = (1, x_1, \ldots, x_n) $，参数为 $ \bm{\theta} = (\theta_0, \theta_1, \ldots, \theta_n) $。
+	设 hypothesis function 为
+	\begin{equation}
+		h_{\bm{\theta}}(\bm{x}) = \bm{\theta}^\intercal \bm{x}
+	\end{equation}
+	Cost function 为 
+	\begin{equation}
+		J(\bm{\theta}) = \sum_{i=1}^{m} \frac{1}{2} \left( h_{\bm{\theta}}(\bm{x}^{(i)}) - y^{(i)} \right)^2
+	\end{equation}
+	其梯度是
+	\begin{equation}
+		\frac{\partial J}{\partial \bm{\theta}} = \sum_{i=1}^{m} ( h_{\bm{\theta}} (\bm{x}^{(i)}) - y^{(i)} ) \bm{x}^{(i)}
+	\end{equation}
+	
+	在采用 batch gradient descent 时，算法为：
+	\begin{lstlisting}[mathescape=true, language=Python]
+		while not convergence:
+			$ \bm{\theta} $ -= $ \alpha \sum_{i=1}^{m} ( h_{\bm{\theta}} (\bm{x}^{(i)}) - y^{(i)} ) \bm{x}^{(i)} $
+	\end{lstlisting}
+	在采用 stochastic gradient descent 时，算法为：
+	\begin{lstlisting}[mathescape=ture, language=Python]
+		while not convergence:
+			for i in range(1, m):
+				$ \bm{\theta} $ -= $ \alpha ( h_{\bm{\theta}} (\bm{x}^{(i)}) - y^{(i)} ) \bm{x}^{(i)} $ 
+	\end{lstlisting}
+	
+	\subsection{Normal Equation}
+		设
+		\begin{equation*}
+			\bm{X} = 
+			\begin{bmatrix}
+				(\bm{x}^{(1)})^\intercal \\
+				\vdots \\
+				(\bm{x}^{(m)})^\intercal
+			\end{bmatrix}
+			, \qquad \bm{y} = 
+			\begin{bmatrix}
+				y^{(1)} \\
+				\vdots \\
+				y^{(m)}
+			\end{bmatrix}
+		\end{equation*}
+		（ $ \bm{X} $ 被称为 design matrix）。易知 
+		\begin{equation}
+			\bm{X} \bm{\theta} - \bm{y} = 
+			\begin{bmatrix}
+				h_{\bm{\theta}} (\bm{x}^{(1)}) - y^{(1)} \\
+				\vdots \\
+				h_{\bm{\theta}} (\bm{x}^{(m)}) - y^{(m)} 
+			\end{bmatrix}
+		\end{equation}
+		所以 
+		\begin{equation}
+			J(\bm{\theta}) = \frac{1}{2} \left( \bm{X} \bm{\theta} - \bm{y} \right)^\intercal \left( \bm{X}\bm{\theta} - \bm{y} \right)
+		\end{equation}
+		令其梯度为 $ \bm{0} $，解得 
+		\begin{equation}
+			\bm{\theta} = \left( \bm{X}^\intercal \bm{X} \right) ^{-1} \bm{X}^\intercal \bm{y}
+		\end{equation}
+		
+	\subsection{Locally Weighted Linear Regression}
+		有时 linear regression 的结果可能不够好。我们更希望在预测 $ (\bm{x}, y) $ 时，
+		给靠近 $ \bm{x} $ 的样本更大的权重，而给远处的样本较小的权重
+		\footnote{预测不同的 $ \bm{x} $ 时，此算法产生不同的模型。这种算法叫做 non-parametric algorithm，与之相对的是 parametric algorithm（参数有限且固定，产生一个模型即可，不需要根据不同的输入产生不同的模型）。}。
+		这样我们需要改变优化目标，对 
+		\begin{equation}
+			J(\bm{\theta}) = \sum_{i=1}^{m} w^{(i)} (\bm{\theta}\bm{x}^{(i)} - y^{(i)})^2
+		\end{equation}
+		进行优化。其中 $ w^{(i)} $ 为相应样本的权重。
+		
+		通常可以取权重为
+		\begin{equation}
+			w^{(i)} = \exp \left( - \frac{ (\bm{x}^{(i)} - \bm{x})^2 }{2\tau ^2} \right)
+		\end{equation}
+		其中 $ \tau $ 称为\emph{波长参数（bandwidth parameter）}，$ \tau $ 越小，远处样本的权重越小。
