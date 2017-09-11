@@ -6,7 +6,7 @@
 	\end{equation}
 	Cost function 为 
 	\begin{equation}
-		J(\bm{\theta}) = \sum_{i=1}^{m} \frac{1}{2} \left( h_{\bm{\theta}}(\bm{x}^{(i)}) - y^{(i)} \right)^2
+		J(\bm{\theta}) = \sum_{i=1}^{m} \frac{1}{2} \left( h_{\bm{\theta}}(\bm{x}^{(i)}) - y^{(i)} \right)^2 \label{eq:lr-cost}
 	\end{equation}
 	其梯度是
 	\begin{equation}
@@ -58,6 +58,25 @@
 		\begin{equation}
 			\bm{\theta} = \left( \bm{X}^\intercal \bm{X} \right) ^{-1} \bm{X}^\intercal \bm{y}
 		\end{equation}
+		
+	\section{Probabilistic Interpretation}
+		假设样本分布是近似线性的，$ y^{(i)} = \bm{\theta}^\intercal \bm{x} + \epsilon^{(i)} $。
+		其中 $ \epsilon^{(i)} $ 为误差值，且服从正态分布 $ \mathcal{N}(0, \sigma^2) $。
+		那么，在给定 $ \bm{\theta} $ 作为参数 
+		\footnote{注意 $ \bm{\theta} $是参数而不是随机变量，每次迭代后我们都能由 $ \bm{\theta} $ 确定 $ (\bm{x}, y) $ 的随机分布} 
+		的情况下，$ y^{(i)} | \bm{x}^{(i)} $ 也服从正态分布，即
+		\begin{equation}
+			p(y^{(i)} | \bm{x}^{(i)}; \bm{\theta}) = \frac{1}{\sqrt{2\pi}\sigma} \exp \left( - \frac{(y{(i)} - \bm{\theta}^\intercal 
+				\bm{x})^2}{2\sigma^2} \right)
+		\end{equation}
+		
+		其 log likelihood 为 
+		\begin{align*}
+			l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(y^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \\
+			&= m\log \frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{\sigma^2} \cdot \frac{1}{2} \sum_{i=1}^{m} \left( h_{\bm{\theta}}(\bm{x}^{(i)}) - y^{(i)} \right)^2
+		\end{align*}
+		最大化此式，相当于最小化 \eqref{eq:lr-cost}。这与我们之前使用 least square 的结论一致。
+		\footnote{另外注意一点，正态分布的参数 $ \sigma $ 并不影响我们的结论。这一点在之后会帮助我们化简问题}
 		
 	\section{Locally Weighted Linear Regression}
 		有时 linear regression 的结果可能不够好。我们更希望在预测 $ (\bm{x}, y) $ 时，
