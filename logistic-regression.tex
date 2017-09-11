@@ -1,6 +1,37 @@
 \chapter{Logistic Regression}
 	对样本进行分类，标签为 $ y^{(i)} \in \{0, 1\} $。定义 hypothesis function 为
+	\footnote{$ g(z) = \frac{1}{1- \exp(-z)} $ 被称为 logistic function。}
 	\begin{equation}
 		h_{\bm\theta}(\bm{x}) = g(\bm{\theta}^\intercal \bm{x}) = \frac{1}{1 + \exp{({\bm{\theta}}^\intercal \bm{x})}}
 	\end{equation}
+	由于 $ h_{\bm{\theta}}(\bm{x}) \in (0, 1] $，我们可以将其看做是概率，即
+	\begin{align*}
+		P(y=1 | \bm{x}; \bm{\theta}) &= h_{\bm{\theta}}(\bm{x}) \\
+		P(y=0 | \bm{x}; \bm{\theta}) &= 1 - h_{\bm{\theta}}(\bm{x})
+	\end{align*}
+	这是一个 Bernoulli 分布，可以简化为 
+	\begin{equation}
+		P(y | \bm{x}; \bm{\theta}) = (h_{\bm{\theta}}(\bm{x}))^y (1 - h_{\bm{\theta}}(\bm{x}))^{1-y}
+	\end{equation}
 	
+	其 log likelihood 为
+	\begin{align*}
+		l(\bm{\theta}) &= \sum_{i=1}^{m} \log P(y^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \\
+		&= \sum_{i=1}^{m} y^{(i)} \bm{\theta}^\intercal \bm{x} - \log(1+\exp \bm{\theta}^\intercal \bm{x}) 
+	\end{align*}
+	求导得
+	\begin{equation}
+		\nabla_{\bm{\theta}} l = \sum_{i=1}^{m} (y^{(i)} - h_{\bm{\theta}}(\bm{x}^{(i)})) \bm{x}^{(i)}
+	\end{equation}
+	
+	综上，stochastic gradient ascent 的每一步迭代为 
+	\begin{align*}
+		\bm{\theta} &= \bm{\theta} + \alpha (y^{(i)} - h_{\bm{\theta}}(\bm{x}^{(i)})) \bm{x}^{(i)}
+	\end{align*}
+	其中 $ \alpha $ 为人为选择的步长。
+	
+	\section{Newton's Method}
+		另一种常用的迭代方法是 Newton's method。每次迭代的步骤是
+		\begin{equation}
+			\bm{\theta} = \bm{\theta} - H^{-1} \nabla_{\bm{\theta}} l(\bm{\theta})
+		\end{equation}
