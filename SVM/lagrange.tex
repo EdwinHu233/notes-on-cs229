@@ -1,4 +1,4 @@
-\subsection{Lagrange Duality}
+\section{Lagrange Duality}
 	这里对凸优化问题作补充。
 	
 	设\emph{原优化问题（primal optimization problem）} 为
@@ -15,7 +15,7 @@
 		其中，$ \bm{\alpha} \geq \bm{0} $
 	\end{df}
 	
-	\subsubsection{Primal Optimization Problem}
+	\subsection{Primal Optimization Problem}
 		定义 $ \theta_\mathcal{P}(\bm{w}) = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，显然有
 		\begin{equation*}
 		\theta_\mathcal{P}(\bm{w}) = 
@@ -31,14 +31,14 @@
 		\end{equation}
 		就是原优化问题，最优解记为 $ p^* $。
 		
-	\subsubsection{Dual Optimization Problem}
+	\subsection{Dual Optimization Problem}
 		定义 $ \theta_\mathcal{D}(\bm{w}) = \min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} $，则
 		\begin{equation}
 		\max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}{\theta_\mathcal{D}(\bm{w})} = \max_{\bm{\alpha} \geq \bm{0}, \bm{\beta}}\min_{\bm{w}}{\mathcal{L}(\bm{w}, \bm{\alpha}, \bm{\beta})} \label{dual-opt-problem}
 		\end{equation}
 		称为对偶问题，最优解记为 $ d^* $。
 		
-	\subsubsection{KKT Condition}\label{sec-kkt}
+	\subsection{KKT Condition}\label{sec-kkt}
 		显然 $ d^* \leq p^* $，并且在一定条件下，$ d^* = p^* $。一种常见的条件是：
 		\begin{itemize}
 			\item $ f $ 和 $ g_i $ 均为凸函数\footnote{凸函数(convex function)：Hessian 矩阵半正定}

@@ -1,5 +1,5 @@
-\subsection{$ l1 $ Norm Soft Margin SVM}
-	\subsubsection{Primal Problem}
+\section{$ l1 $ Norm Soft Margin SVM}
+	\subsection{Primal Problem}
 		有时数据集不是严格线性可分的，而是存在个别异常的点。我们可以允许部分点的 $ \gamma^{(i)} < 1 $ （甚至为负）。
 		一种方法是引入 $ l1 $ regularization。
 		\begin{align*}
@@ -9,7 +9,7 @@
 		\end{align*}
 		其中 $ \xi_i $ 为允许的误差。（$ \bm{w}, b, \bm{\xi} $ 都是自变量）
 		
-	\subsubsection{Dual Problem}
+	\subsection{Dual Problem}
 		Generalized Lagrangian 为
 		\begin{equation*}
 			\mathcal{L}( \bm{w}, b, \bm{\xi}, \bm{\alpha}, \bm{r} ) = \frac{1}{2} \| \bm{w} \|^2 + C \sum_i \xi_i - \sum_i \alpha_i \left[ y^{(i)} (\bm{w^}\intercal \bm{x} + b) - 1 + \xi_i \right] - \sum_i r_i \xi_i
@@ -27,12 +27,12 @@
 			& \sum_i \alpha_i y^{(i)} = 0
 		\end{align}
 		
-	\subsubsection{Solution}
+	\subsection{Solution}
 		与普通的 SVM 类似，求解对偶问题得到 $ \bm{\alpha}^* $ 后，即可求得 $ \bm{w}^* $。
 		与 \eqref{svm-commonly-solving-b} 不同的是，此时支持向量不再是 functional margin 最小的点，故 $ b^* $ 的求解不再适用此式。
 		%TODO
 		
-	\subsubsection{KKT Dual-complimentary Conditions}
+	\subsection{KKT Dual-complimentary Conditions}
 		对 KKT 条件稍作变形可得
 		\begin{align*}
 			\alpha_i \geq 0, \quad & r_i \geq 0, \quad \alpha_i + r_i = C \\

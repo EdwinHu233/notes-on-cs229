@@ -1,4 +1,4 @@
-\subsection{Kernels}
+\section{Kernels}
 	\begin{df}[Feature mapping]
 		我们称原始输入的数据为样本的 attributes，对 attributes 映射得到 features。这样的映射称为 feature mapping，记作 $ \phi(\bm{x}) $
 	\end{df}
@@ -14,7 +14,7 @@
 	直觉上，内积表示了两个向量的“相似”程度：越是接近平行的向量，内积的绝对值越大；越是接近正交的向量，内积的绝对值越小。
 	Kernel methods 也应该具有类似的特征。
 	
-	\subsubsection{Common kernels}
+	\subsection{Common kernels}
 		常见的 kernel 有：
 		
 		\begin{df}[Polynomial kernel]
@@ -31,7 +31,7 @@
 		\end{df}
 		这个 kernel 将 $ n $ 维向量映射到无穷维的 feature space 中。复杂度为 $ O(n) $
 		
-	\subsubsection{Validation}
+	\subsection{Validation}
 		\begin{df}[Kernel matrix]
 			设 $ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 为数据集，$ K $ 是一个合法的 kernel（即 $ \exists \phi: \ldots $ ），
 			则对应的 kernel matrix 定义为

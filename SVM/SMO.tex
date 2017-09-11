@@ -1,4 +1,4 @@
-\subsection{SMO}
+\section{SMO}
 	SMO (sequential minimal optimization) 算法利用了 coordinate ascent 的思想。
 	每次迭代对 \eqref{eq:smo-obj} 中 $ \bm{\alpha} $ 的某两个分量 $ \alpha_i, \alpha_j $ 优化目标函数。
 	Soft margin classifier 的（对偶）优化问题如下：
@@ -8,7 +8,7 @@
 	& \sum_i \alpha_i y^{(i)} = 0 \label{eq:smo-constrain2}
 	\end{align}
 	
-	\subsubsection{Solving $ \alpha $}
+	\subsection{Solving $ \alpha $}
 		假设在这次迭代中要对 $ \alpha_1, \alpha_2 $ 优化 \eqref{eq:smo-obj}
 		（我们之后再讨论每次迭代应该怎么选取要优化的分量)。
 		
@@ -67,7 +67,7 @@
 		\end{equation*}
 		代入 \eqref{eq:smo-a1-and-a2} 即可得到 $ \alpha_1^\new $。
 		
-	\subsubsection{Updating} 
+	\subsection{Updating} 
 		在求出 $ \bm{\alpha}^\new $ 之后，我们要更新 $ \bm{w}, b $。
 		
 		由于只有 $ \alpha_1, \alpha_2 $ 发生了改变，所以

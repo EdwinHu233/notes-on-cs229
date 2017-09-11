@@ -1,4 +1,4 @@
-\section{Linear Regression}
+\chapter{Linear Regression}
 	设样本特征为 $ n $ 维，自变量为 $ \bm{x} = (1, x_1, \ldots, x_n) $，参数为 $ \bm{\theta} = (\theta_0, \theta_1, \ldots, \theta_n) $。
 	设 hypothesis function 为
 	\begin{equation}
@@ -25,7 +25,7 @@
 				$ \bm{\theta} $ -= $ \alpha ( h_{\bm{\theta}} (\bm{x}^{(i)}) - y^{(i)} ) \bm{x}^{(i)} $ 
 	\end{lstlisting}
 	
-	\subsection{Normal Equation}
+	\section{Normal Equation}
 		设
 		\begin{equation*}
 			\bm{X} = 
@@ -59,7 +59,7 @@
 			\bm{\theta} = \left( \bm{X}^\intercal \bm{X} \right) ^{-1} \bm{X}^\intercal \bm{y}
 		\end{equation}
 		
-	\subsection{Locally Weighted Linear Regression}
+	\section{Locally Weighted Linear Regression}
 		有时 linear regression 的结果可能不够好。我们更希望在预测 $ (\bm{x}, y) $ 时，
 		给靠近 $ \bm{x} $ 的样本更大的权重，而给远处的样本较小的权重
 		\footnote{预测不同的 $ \bm{x} $ 时，此算法产生不同的模型。这种算法叫做 non-parametric algorithm，与之相对的是 parametric algorithm（参数有限且固定，产生一个模型即可，不需要根据不同的输入产生不同的模型）。}。
