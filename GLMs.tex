@@ -2,5 +2,218 @@
 	\section{The Exponential Family}
 		如果一种随机分布可以表示为
 		\begin{equation}
-			p(y; \bm{\eta}) = 
+			p(y; \bm{\eta}) = b(y) \exp \left( \bm{\eta}^\intercal T(y) - \alpha(\bm{\eta}) \right)
 		\end{equation}
+		则称这种随机分布为以 $ \bm{\eta} $ 为参数的 exponential family。
+		\footnote{其中 $ \bm{\eta} $ 称为 natural parameter；$ T(y) $ 称为 sufficient statistic，且通常 $ T(y) = y $；
+			$ \alpha(\bm{\eta}) $ 称为 log partition function，起到 normalization 的作用。}
+		
+		很多常见的随机分布都是 exponential family。
+		
+		\subsection{Gaussian Distribution} \label{subsec:glm-gau}
+			设 $ p(y; \mu) = \frac{1}{\sqrt{2\pi}} \exp \left( - \frac{1}{2} (y-\mu)^2 \right) $，则
+			\begin{align*}
+				\eta &= \mu \\
+				\alpha(\eta) &= \mu^2 / 2 \\
+				T(y) &= y \\
+				b(y) &= \frac{1}{\sqrt{2\pi}} \exp(-\frac{y^2}{2})
+			\end{align*}
+			
+		\subsection{Bernoulli Distribution} \label{subsec:glm-ber}
+			设 $ p(y; \phi) = \phi^y (1-\phi)^{(1-y)} $，则
+			\begin{align*}
+				\eta &= \log ( \frac{\phi}{1-\phi} ) \\
+				\alpha(\eta) &= \log ( 1+\exp(\eta) ) \\
+				T(y) &= y \\
+				b(y)& = 1
+			\end{align*}
+			
+	\section{GLMs}
+		我们把通过以下假设得到的模型称为 \emph{generalized linear models}：
+		\begin{itemize}
+			\item $ y | \bm{x}; \bm{\theta} \sim \text{ExponentialFamily}(\bm{\eta}) $
+			\item $ h_{\bm{\theta}}(\bm{x}) = \mathbb{E}[T(y)|\bm{x};\bm{\theta}] $
+			\item $ \bm{\eta} $ 与 $ \bm{x} $ 线性相关，即 $ \bm{\eta} = \bm{\theta}^\intercal \bm{x} $ \footnote{当 $ \bm{\eta} $为向量时，$ \bm{\theta} $ 为矩阵 $ \left[ \bm{\theta}_1, \ldots, \bm{\theta}_n \right] $ }
+		\end{itemize}
+		GLM 中有三种重要的参数：
+		\begin{enumerate}
+			\item 随机分布的具体的参数 （如 Bernoulli 中的 $ \phi $，Gaussian 中的 $ \mu $ ）
+			\item 将随机分布看做是 exponential family 时，natural parameter $ \bm{\eta} $ 
+			\item 我们要优化的目标 $ \bm{\theta} $ 
+		\end{enumerate}
+		这三种参数相互之间存在这样的关系：
+		\begin{itemize}
+			\item 1 与 2 存在自然的关系，例如 \ref{subsec:glm-ber} 和 \ref{subsec:glm-gau}。
+			\item 2 与 3 存在人为设定的关系 $ \bm{\eta} = \bm{\theta}^\intercal \bm{x} $
+		\end{itemize}
+		这样我们就能求出 1 与 3 的关系。换句话说，优化目标 $ \bm{\theta} $ 与随机分布的具体的参数之间的关系。
+		在进行 maximum likelihood 时，将具体的参数替换为 $ \bm{\theta} $，即可求解。
+		
+		\subsection{Linear Regression}
+			假设 $ y|\bm{x};\bm{\theta} \sim \mathcal{N}(\mu, 1^2) $，则由 \ref{subsec:glm-gau}
+			\begin{align*}
+				h_{\bm{\theta}} (\bm{x}) &= \mathbb{E} [T(y) | \bm{x}; \bm{\theta}] \\
+				&= \mu \\
+				&= \eta \\
+				&= \bm{\theta}^\intercal \bm{x} 
+			\end{align*}
+			
+			Log likelihood 为
+			\begin{align*}
+				l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(y^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \\
+				&= \sum \log \frac{1}{\sqrt{2\pi}} \exp \left( - \frac{1}{2} (y^{(i)}-\mu)^2 \right) \\
+				&= -m \cdot \frac{1}{2} (y^{(i)} - \mu)^2 + \text{const} \\
+				&= -m \cdot \frac{1}{2} (y^{(i)} - \bm{\theta}^\intercal \bm{x})^2 + \text{const}
+			\end{align*}
+			对其最大化，可以得到与之前相同的结论。
+			
+		\subsection{Logistic Regression}
+			假设 $ y | \bm{x} ; \bm{\theta} \sim \text{Ber}(\phi) $，则由 \ref{subsec:glm-ber} 
+			\begin{align*}
+				h_{\bm{\theta}} (\bm{x}) &= \mathbb{E} [T(y) | \bm{x}; \bm{\theta}] \\
+				&= \phi \\
+				&= \frac{1}{1 + \exp(-\bm{\eta})} \\
+				&= \frac{1}{1 + \exp(-\bm{\theta}^\intercal \bm{x})}
+			\end{align*}
+			
+			Log likelihood 为
+			\begin{align*}
+				l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(y^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \\
+				&= \sum \log \phi^{(y^{(i)})} (1-\phi)^{(1-y^{(i)})} \\
+				&= \sum y^{(i)} \bm{\theta} \bm{x}^{(i)} - \log \left( 1+\exp(\bm{\theta}^\intercal \bm{x}^{(i)}) \right)
+			\end{align*}
+			对其最大化，可以得到与之前相同的结论。
+			
+	\section{Softmax Regression}
+		\subsection{Notation}
+			对于一个 $ k $ 分类问题，设 $ T(y) \in \mathbb{R}^{k} $ 为 
+			\begin{equation*}
+				T(1) = 
+				\begin{bmatrix}
+					1\\
+					0\\
+					\vdots\\
+					0
+				\end{bmatrix}
+				, \quad T(2) = 
+				\begin{bmatrix}
+				0\\
+				1\\
+				\vdots\\
+				0
+				\end{bmatrix}
+				, \ldots, \quad T(k) = 
+				\begin{bmatrix}
+				0\\
+				0\\
+				\vdots\\
+				1
+				\end{bmatrix}
+			\end{equation*}
+			所以有
+			\begin{align}
+				T(y)_i &= 1\{y=1\} \\
+				\mathbb{E}[T(y)_i] &= \phi_i
+			\end{align} 
+		
+			假设 $ y $ 服从 multinomial distribution
+			\footnote{由于 $ \sum_{i=1}^{k} \phi_i = 1 $，所以只有 $ k-1 $ 个独立参数 $ \phi_1, \ldots, \phi_{k-1} $。
+				至于 $ \phi_k $ 只是 $ 1-\sum_{i=1}^{k-1} \phi_i $ 的一种简便记法。}
+			，即
+			 $ p(y = i;\bm{\phi}) = \phi_i $。
+			更统一地表示为：
+			\begin{equation}
+			p(y;\bm{\phi}) = \prod_{i=1}^{k} \phi_i ^{ 1\{ y=i \} } = \prod_{i=1}^{k} \phi_i ^{ T(y)_i } \label{eq:glm-probility1}
+			\end{equation}
+		
+		\subsection{Multinomial Distribution}
+			由 \eqref{eq:glm-probility1} 知
+			\begin{align*}
+				p(y;\bm{\phi}) &= \prod_{i=1}^{k-1} \phi_i ^{ T(y)_i } \cdot \phi_k^{1-\sum_{j=1}^{k-1}T(y)_j} \\
+				&= \prod_{i=1}^{k-1} \exp \log \left( \phi_i ^{ T(y)_i } \cdot \phi_k^{1-\sum_{j=1}^{k-1}T(y)_j} \right) \\
+				&= \prod_{i=1}^{k-1} \exp \left( \sum_{i=1}^{k-1} \log \left( \frac{\phi_i}{\phi_k} \right) T(y)_i + \log \phi_k  \right)
+			\end{align*}
+			所以 multinomial distribution 也是 exponential family
+			\begin{align}
+				\bm{\eta} &= 
+				\begin{bmatrix}
+					\log(\phi_1 / \phi_k) \\
+					\log(\phi_2 / \phi_k) \\
+					\vdots \\
+					\log(\phi_{k-1} / \phi_k) \\
+					\log(\phi_k / \phi_k)
+				\end{bmatrix} \label{eq:glm-mult-1} \\
+				\alpha(\bm{\eta}) &= - \log(\phi_k) \label{eq:glm-mult-2} \\
+				T(y)_i &= 1\{y=1\} \label{eq:glm-mult-3} \\
+				b(y) &= 1 \label{eq:glm-mult-4}
+			\end{align}
+			
+			由 \eqref{eq:glm-mult-1} 知
+			\begin{align*}
+				\eta_i &= \log(\phi_i / \phi_k)  \To \\ 
+				\phi_i &= \phi_k \exp(\eta_i) \To \numberthis\label{eq:glm-mult-phi-1} \\
+				1 &= \phi_k\sum_{i=1}^{k} \exp(\eta_i) \To \\
+				\phi_k &= \frac{1}{\sum_{i=1}^{k} \exp(\eta_i)} \numberthis\label{eq:glm-mult-phi-k}
+			\end{align*}
+			将 \eqref{eq:glm-mult-phi-k} 代入 \eqref{eq:glm-mult-phi-1} 得
+			\begin{equation}
+				 \phi_i = \frac{\exp(\eta_i)}{\sum_{j=1}^{k} \exp(\eta_j)} = \frac{\exp(\bm{\theta}_i^\intercal \bm{x})}{\sum_{j=1}^{k} \exp(\bm{\theta}_j^\intercal \bm{x})} \label{eq:glm-mult-phi}
+			\end{equation}
+			
+		\subsection{The Algorithm}
+			由 \eqref{eq:glm-probility1} 和 \eqref{eq:glm-mult-phi} 知，log likelihood 为
+			\begin{align*}
+				l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(y^{(i)} | \bm{x}^{(i)} ; \bm{\theta} ) \\
+				&= \sum_{i=1}^{m} \log \prod_{j=1}^{k} \left( \frac{ \exp(\bm{\theta}_j^\intercal \bm{x}^{(i)}) }{ \sum_{l=1}^{k} \exp \left( \bm{\theta}_l^\intercal \bm{x}^{(i)} \right) } \right)^{1\{y^{(i)}=j\}} \\
+				&= \sum_{i=1}^{m} \left[ \sum_{j=1}^{k} 1\{y^{(i)}=j\} \cdot \log \frac {\exp(\bm{\theta}_j^\intercal \bm{x}^{(i)})} {\bm{1}^\intercal \exp(\bm{\theta}^\intercal \bm{x}^{(i)}) } \right] \\
+				&= \sum_{i=1}^{m} T(y^{(i)})^\intercal \log
+				\begin{bmatrix}
+					\frac {\exp(\bm{\theta}_1^\intercal \bm{x}^{(i)})} {\bm{1}^\intercal \exp(\bm{\theta}^\intercal \bm{x}^{(i)}) } \\
+					\vdots \\
+					\frac {\exp(\bm{\theta}_k^\intercal \bm{x}^{(i)})} {\bm{1}^\intercal \exp(\bm{\theta}^\intercal \bm{x}^{(i)}) }
+				\end{bmatrix} \\
+				&= \sum_{i=1}^{m} T(y^{(i)}) \log \frac {\exp(\bm{\theta}^\intercal \bm{x}^{(i)})} {\bm{1}^\intercal \exp(\bm{\theta}^\intercal \bm{x}^{(i)}) } 
+			\end{align*}
+			定义 softmax 函数为
+			\begin{equation}
+				\softmax(\bm{z}) = \frac {\exp(\bm{z})} {\bm{1}^\intercal \exp(\bm{z}) } 
+			\end{equation}
+			并设 $ \bm{W} = \bm{\theta}^\intercal $ 则有
+			\begin{equation}
+				l(\bm{W}) = \sum_{i=1}^{m} T(y^{(i)})^\intercal \log \softmax(\bm{W} \bm{x}^{(i)})
+			\end{equation}
+			
+			设 
+			\begin{align*}
+				 l' &= T(y)^\intercal \log \softmax(\bm{W} \bm{x}) \\
+				 &= T(y)^\intercal \log \exp (\bm{Wx}) - T(y)^\intercal \bm{1} \log (\bm{1}^\intercal \exp \bm{Wx}) \\
+				 &= T(y)^\intercal \bm{Wx} - \log \bm{1}^\intercal \exp(\bm{Wx}) 
+			\end{align*}
+			则
+			\begin{align*}
+				dl' &= T(y)^\intercal d\bm{W} \bm{x} - \frac{1}{\bm{1}^\intercal \exp(\bm{Wx})} \cdot \bm{1}^\intercal \left( \exp(\bm{Wx}) \odot d\bm{Wx} \right) \\
+				&= \tr(\ldots) - \tr(\ldots) \\
+				&= \tr(\bm{x} T(y)^\intercal d\bm{W}) - \frac{1}{\bm{1}^\intercal \exp(\bm{Wx})} \tr( (\bm{1} \odot \exp(\bm{Wx}) )^\intercal d\bm{Wx} ) \\
+				&= \tr(...) - \tr(\bm{x} \softmax(\bm{Wx})^\intercal d\bm{W} ) \\
+				&= \tr(x(T(y) - \softmax(\bm{Wx}))^\intercal d\bm{W})
+			\end{align*}
+			所以
+			\begin{equation}
+				\nabla_{\bm{W}} l' = (T(y) - \softmax(\bm{Wx}))^\intercal \bm{x}^\intercal
+			\end{equation}
+			$ \nabla_{\bm{W}} l $ 的形式也是相似的。
+			
+			迭代求出 $ \bm{W} $，那么就得到了 hypothesis function 
+			\begin{align*}
+				h_{\bm{\theta}} (\bm{x})_i &= \mathbb{E} [T(y)_i | \bm{x} ; \bm{\theta}] \\
+				&= \mathbb{E} \left[ 1\{y=i\} | \bm{x} ; \bm{\theta} \right] \\
+				&= \phi_i \\ 
+				&= \frac{\exp(\bm{\theta}_i^\intercal \bm{x})}{\sum_{j=1}^{k} \exp(\bm{\theta}_j^\intercal \bm{x})} \\
+			\end{align*}
+			即 
+			\begin{equation}
+				h_{\bm{\theta}} (\bm{x}) = \softmax(\bm{Wx})
+			\end{equation}
+		
+			
+			
