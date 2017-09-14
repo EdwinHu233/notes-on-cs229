@@ -1,0 +1,52 @@
+\chapter{Generative Leaning Algorithms}
+	之前学习的算法都是 \emph{discriminative learning algorithm}，下面介绍另一种算法 \emph{generative learning algorithm}。
+	二者有以下区别：
+	\begin{itemize}
+		\item Discriminative : 直接对 $ p(y | \bm{x}; \bm{\theta}) $ 建模，得到预测值
+		\item Generative : 对于不同的标签值 $ y_1, y_2, ... $ ，对 $ p(\bm{x} | y_1), p(\bm{x} | y_2), \ldots $ 建模，
+		再根据 Bayes 公式得到 $ \argmax_y p(y | \bm{x}) $ 作为预测值。
+	\end{itemize}
+	
+	\section{Gaussian Discriminant Analysis}
+		\subsection{Multivariate Gaussian Distribution}
+			概率分布如下
+			\begin{equation}
+				p(\bm{x}; \bm{\mu}, \bm{\Sigma} ) = \frac{1}{(2\pi)^{n/2} |\bm{\Sigma}|^{1/2}} \exp \left( -\frac{1}{2} (\bm{x}-\bm{\mu})^\intercal \bm{\Sigma}^{-1} (\bm{x}-\bm{\mu}) \right)
+			\end{equation}
+			其中 $ \bm{\mu} = \mathbb{E}[\bm{X}] .\quad \bm{\Sigma} = \text{Cov}(\bm{X}) = \mathbb{E}\left[ (\bm{X}-\mathbb{E}[\bm{X}]) (\bm{X}-\mathbb{E}[\bm{X}])^\intercal \right] $
+			
+		\subsection{GDA Model} 
+			对一个二分类问题，作如下假设
+			\footnote{这里假设两个 Gaussian distribution 的协方差矩阵相同}
+			\begin{align*}
+				y &\sim \text{Ber}(\phi) \\
+				\bm{x} | y=0 &\sim \mathcal{N} (\bm{\mu}_0, \bm{\Sigma}) \\
+				\bm{x} | y=1 &\sim \mathcal{N} (\bm{\mu}_1, \bm{\Sigma})
+			\end{align*}
+			则得到 
+			\begin{align*}
+				p(y) &= \phi^y (1-\phi)^{(1-y)} \\
+				p(\bm{x} | y=0) &= \frac{1}{(2\pi)^{n/2} |\bm{\Sigma}|^{1/2}} \exp \left( -\frac{1}{2} (\bm{x}-\bm{\mu}_0)^\intercal \bm{\Sigma}^{-1} (\bm{x}-\bm{\mu}_0) \right) \\
+				p(\bm{x} | y=1) &= \frac{1}{(2\pi)^{n/2} |\bm{\Sigma}|^{1/2}} \exp \left( -\frac{1}{2} (\bm{x}-\bm{\mu}_1)^\intercal \bm{\Sigma}^{-1} (\bm{x}-\bm{\mu}_1) \right)
+			\end{align*}
+			通过 maximum likelihood 
+			\begin{align*}
+				l(\phi, \bm{\mu}_0, \bm{\mu}_1, \bm\Sigma) &= \log \prod_{i=1}^{m} p(\bm x^{(i)}, y^{(i)}; \phi, \bm{\mu}_0, \bm{\mu}_1, \bm{\Sigma}) \\
+				&= \log \prod_{i=1}^{m} p(\bm x^{(i)} | y^{(i)}; \phi, \bm{\mu}_0, \bm{\mu}_1, \bm{\Sigma}) p(y^{(i)}; \phi)
+			\end{align*}
+			可以解得 
+			\begin{align*}
+				\phi &= \frac{1}{m} \sum_{i=1}^{m} 1\{y^{(i)}=1\} \\
+				\bm{\mu}_0 &= \frac{ \sum_{i=1}^{m} 1\{y^{(i)}=0\} \bm{x}^{(i)}} { \sum_{i=1}^{m} 1\{y^{(i)}=0\} } \\
+				\bm{\mu}_1 &= \frac{ \sum_{i=1}^{m} 1\{y^{(i)}=1\} \bm{x}^{(i)}} { \sum_{i=1}^{m} 1\{y^{(i)}=1\} } \\
+				\bm{\Sigma} &= \frac{1}{m} \sum_{i=1}^{m} \left( \bm{x}^{(i)} - \mu_{y^{(i)}} \right) \left( \bm{x}^{(i)} - \mu_{y^{(i)}} \right)^\intercal
+			\end{align*}
+			
+		\subsection{GDA and Logistic Regression}
+			可以证明，在 GDA 中 $ p(y=1 | \bm{x}; \phi, \bm{\Sigma}, \bm{\mu}_0, \bm{\mu}_1) $ 可以整理为 $ \frac{1}{1+\exp(\bm{\theta}^\intercal \bm{x})} $ 的形式。甚至将 Gaussian distribution 换成任何的 exponential family ，此结论都成立。
+			
+			事实上，GDA 对数据作了更强的假设，而 logistic regression 中的假设要弱一些。当数据确实符合 Gaussian distribution 时，GDA 的效果比 logistic 
+			regression 的效果更好。反之，logistic regression 的效果更好。
+			
+	\section{Naive Bayes} 
+		
