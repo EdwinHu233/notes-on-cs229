@@ -160,8 +160,9 @@
 				 \phi_i = \frac{\exp(\eta_i)}{\sum_{j=1}^{k} \exp(\eta_j)} = \frac{\exp(\bm{\theta}_i^\intercal \bm{x})}{\sum_{j=1}^{k} \exp(\bm{\theta}_j^\intercal \bm{x})} \label{eq:glm-mult-phi}
 			\end{equation}
 			
-		\subsection{The Algorithm}
+		\subsection{Solution}
 			由 \eqref{eq:glm-probility1} 和 \eqref{eq:glm-mult-phi} 知，log likelihood 为
+			\footnote{以下推导中一些细节见\href{https://zhuanlan.zhihu.com/p/24709748}{矩阵求导术}}
 			\begin{align*}
 				l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(y^{(i)} | \bm{x}^{(i)} ; \bm{\theta} ) \\
 				&= \sum_{i=1}^{m} \log \prod_{j=1}^{k} \left( \frac{ \exp(\bm{\theta}_j^\intercal \bm{x}^{(i)}) }{ \sum_{l=1}^{k} \exp \left( \bm{\theta}_l^\intercal \bm{x}^{(i)} \right) } \right)^{1\{y^{(i)}=j\}} \\
