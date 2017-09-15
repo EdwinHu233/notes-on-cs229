@@ -49,4 +49,32 @@
 			regression 的效果更好。反之，logistic regression 的效果更好。
 			
 	\section{Naive Bayes} 
+		Naive Bayes 是一种简单的分类算法。例如要解决垃圾邮件的分类问题，我们令 $ y \in {0, 1} $ 表示是否为垃圾邮件，并维护一个字典 ，$ x_i \in {0, 1} $ 表示字典中第 $ i $ 个单词是否出现。
+		
+		Naive Bayes 算法假设
+		\footnote{这个假设被称为 \emph{naive Bayes assumption}，虽然很不合理，但很多时候效果不错。}
+		：在给定 $ y $ 的情况下，$ x_i $ 条件独立，即
+		\begin{align*}
+			p(x_1, \ldots, x_n | y) &= p(x_1 | y) p(x_2 | y, x_1) \ldots p(x_n | y, x_1, \ldots, x_{n-1}) \\
+			&= \prod_{i=1}^{n} p(x_i | y)
+		\end{align*}
+		
+		设 $ \phi_{i | y=1} = p(x_i=1 | y=1), \phi_{i | y=0} = p(x_i=1 | y=0), \phi_y = p(y=1)$，则通过 maximum likelihood 可得
+		\begin{align}
+			\phi_{i | y=1} &= \frac {\sum_{j=1}^{m}1\{ x_i^{(j)}=1 \land y^{(j)}=1 \}} {\sum_{j=1}^{m}1\{y^{(j)}=1\}} \\
+			\phi_{i | y=0} &\quad\text{类似} \\
+			\phi_y &= \frac{\sum_{j=1}^{m}1\{y^{(j)}=1\}}{m}
+		\end{align}
+		所以由 Bayes 公式得
+		\begin{align*}
+			p(y=1 | \bm{x}) &= \frac{p(\bm{x} | y=1) p(y=1)}{p(\bm{x} | y=1) p(y=1) + p(\bm{x} | y=0) p(y=0)} \\
+			&= \frac { \prod_{i=1}^{m} p(x_i | y=1) p(y=1) } { \prod_{i=1}^{m} p(x_i | y=1) p(y=1) + \prod_{i=1}^{m} p(x_i | y=0) p(y=0) }
+		\end{align*}
+		实际只需要比较 $ \prod_{i=1}^{m} p(x_i | y=1) p(y=1) \text{和} \prod_{i=1}^{m} p(x_i | y=0) p(y=0) $ 的大小即可。
+		
+		值得注意的有两点：
+		\begin{enumerate}
+			\item Naive Bayes 还可以推广到多分类问题。
+			\item 一般要加 Laplace smoothing，解决概率为 $ 0 $ 的问题。
+		\end{enumerate}
 		
