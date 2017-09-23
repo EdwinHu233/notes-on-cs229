@@ -84,12 +84,12 @@
 		\footnote{预测不同的 $ \bm{x} $ 时，此算法产生不同的模型。这种算法叫做 non-parametric algorithm，与之相对的是 parametric algorithm（参数有限且固定，产生一个模型即可，不需要根据不同的输入产生不同的模型）。}。
 		这样我们需要改变优化目标，对 
 		\begin{equation}
-			J(\bm{\theta}) = \sum_{i=1}^{m} w^{(i)} (\bm{\theta}\bm{x}^{(i)} - y^{(i)})^2
+			J(\bm{\theta}) = \sum_{i=1}^{m} w^{(i)} (\bm{\theta}^\intercal \bm{x}^{(i)} - y^{(i)})^2
 		\end{equation}
 		进行优化。其中 $ w^{(i)} $ 为相应样本的权重。
 		
 		通常可以取权重为
 		\begin{equation}
-			w^{(i)} = \exp \left( - \frac{ (\bm{x}^{(i)} - \bm{x})^2 }{2\tau ^2} \right)
+			w^{(i)} = \exp \left( - \frac{ \| \bm{x}^{(i)} - \bm{x} \|^2 }{2\tau ^2} \right)
 		\end{equation}
 		其中 $ \tau $ 称为\emph{波长参数（bandwidth parameter）}，$ \tau $ 越小，远处样本的权重越小。
