@@ -1,0 +1,21 @@
+\chapter{k-means}
+	\section{Algorithm}
+		K-means 是一种 unsupervised algorithm。对于给定的 $ k $，将数据集分为 $ k $ 个 cluster。
+		\begin{enumerate}
+			\item 将 cluster centroids $ \bm{\mu}_1, \ldots, \bm{\mu}_k $ 随机初始化
+			\item 循环直到收敛：
+			\begin{align}
+				\forall i, \quad c^{(i)} &= \argmin_j \| \bm{x}^{(i)} - \bm{\mu}_j \|^2 \label{eq:kmeans-algo1} \\
+				\forall j, \quad \bm{\mu}_j &= \frac{\sum_{i=1}^m 1\{c^{(i)}=j\} \bm{x}^{(i)}}{\sum_{i=1}^m 1\{c^{(i)}=j\}} \label{eq:kmeans-algo2}
+			\end{align}
+		\end{enumerate}
+		其中 $ c^{(i)} $ 是每个样本 “对应” 的 cluster 编号。\eqref{eq:kmeans-algo1} 更新编号，\eqref{eq:kmeans-algo2} 更新 cluster centroids 的位置。
+	
+	\section{Convergence}
+		定义 distortion function ：
+		\begin{equation}
+			J(\bm{c}, \bm{\mu}) = \sum_{i=1}^{m} \| \bm{x}^{(i)} - \bm{\mu}_{c^{(i)}} \|^2
+		\end{equation}
+		易知，k-means 的迭代过程实际上是对 $ J $ 进行 coordinate descent。 $ J $ 单调下降，最终收敛。\footnote{通常 $ \bm{c} $ 和 $ \bm{\mu} $ 也会收敛。}
+		
+		注意，$ J $ 不是一个凸函数，coordinate descent 可能陷入局部最优值。可以重复运行算法，每次将 cluster centroids 随机初始化为不同的值。

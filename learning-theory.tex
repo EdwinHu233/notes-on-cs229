@@ -1,0 +1,14 @@
+\chapter{Learning Theory}
+	\section{Bias-Variance Tradeoff}
+		假设 $ \bm{x} $ 与 $ y $ 真实的关系是 $ y = f(\bm{x}) + \epsilon , \epsilon \sim \mathcal{N}(0, \sigma^2) $。
+		我们的预测为 $ \hat{y} = \hat{f}(\bm{x}) $，与 $ \epsilon $ 独立。则
+		\begin{align*}
+			\text{Error} &= \mathbb{E}\left[ (\hat{y}-y)^2 \right] \\
+			&= \mathbb{E}[ \hat{y}^2 ] + \mathbb{E}[y^2] - 2\mathbb{E}[\hat{y}] \mathbb{E}[y] \\
+			&= \var \hat{y} + (\mathbb{E}\hat{y})^2 + \var y + (\mathbb{E}y)^2 - 2\mathbb{E}[\hat{y}] \mathbb{E}[y] \\
+			&= \var \hat{y} + \left( \mathbb{E}\hat{y} - f(\bm{x}) \right)^2 + \sigma^2 \\
+			&= \text{Variance} + \text{Bias}^2 + \text{IrreducibleError}
+		\end{align*}
+		通常，随着模型复杂度的上升，Bias 会下降，但 Variance 会上升。
+		
+		
