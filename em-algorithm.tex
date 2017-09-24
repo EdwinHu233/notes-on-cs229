@@ -1,0 +1,67 @@
+\chapter{The EM Algorithm}
+	\section{Jensen's Inequality}
+		设 $ f $ 是一个凸函数，$ \bm{X} $ 是一个随机变量，则：
+		\begin{equation}
+			\mathbb{E}[f(\bm{X})] \geq f(\mathbb{E}[\bm{X}]) \label{eq:jeson-ineq}
+		\end{equation}
+		特别地，当 $ f $ 是严格凸函数时，有：
+		\begin{equation}
+			\mathbb{E}[f(\bm{X})] = f(\mathbb{E}[\bm{X}]) \iff p(\bm{X} = \mathbb{E}[\bm{X}]) = 1 \label{eq:jeson-ineq-extra}
+		\end{equation}
+		
+		若 $ f $ 是凹函数，则有相反的结论。
+		
+	\section{The EM Algorithm}
+		对于数据集 $ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $，若要用分布 $ p(\bm{x}, z) $ 去拟合，则：
+		\begin{align*}
+			l(\bm{\theta}) &= \sum_{i=1}^{m} \log p(\bm{x}^{(i)}; \bm{\theta}) \\
+			&= \sum_{i=1}^{m} \log \sum_{z^{(i)}} p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta}) \\
+			&= \sum_{i=1}^{m} \log \sum_{z^{(i)}} Q_i(z^{(i)}) \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})}
+		\end{align*}
+		我们希望 $ \forall i, \sum_{z} Q_i(z) = 1 \quad \land \quad \forall i, z, Q_i(z) \geq 0 $。
+		这样就可以把 $ Q_i $ 看做一个随机分布，$ z^{(i)} $ 是这个随机分布产生的样本。
+		接上式，
+		\begin{equation*}
+			l(\bm{\theta}) = \sum_i \log \mathbb{E}_{z^{(i)} \sim Q_i} \left[ \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})} \right] 
+		\end{equation*}
+		
+		\subsection{Lower Bound}
+			由 \eqref{eq:jeson-ineq} 的凹函数版本知，$ \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})} $ 相当于随机变量 $ X $，$ \log $ 相当于凹函数 $ f $，则
+			\begin{align*}
+				l(\bm{\theta}) &= \sum_i f(\mathbb{E}[\bm{X}]) \\
+				&\geq \sum_i \mathbb{E}[f(\bm{X})] \\
+				&= \sum_i \sum_{z^{(i)}} Q_i(z^{(i)}) \log \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})} \label{eq:em-algo-lower-bound} \numberthis
+			\end{align*}
+			
+			对于任意给定的 $ \bm{\theta} $， \eqref{eq:em-algo-lower-bound} 给出了 $ l $ 的下界。
+			当改变 $ \bm{\theta} $ 使这个下界上升时，$ l $ 也上升。
+		
+		\subsection{The Best Lower Bound}
+			我们希望，对于当前的 $ \bm{\theta} $，这个下界是 $ l $ 的下确界；
+			之后改变 $ \bm{\theta} $ 使这个下界最大化，以此优化 $ l $。
+			这就取决于如何选择 $ Q_i $ 了。
+			
+			由 \eqref{eq:jeson-ineq-extra} 知，对于当前的 $ \bm{\theta} $， 若
+			\begin{equation*}
+				\forall i, \exists c \in \mathbb{R}, \qquad \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})} = c
+			\end{equation*}
+			那么 $ X \text{是常数} \Rightarrow p({X} = \mathbb{E}[{X}]) = 1 \Rightarrow \mathbb{E}[f({X})] = f(\mathbb{E}[{X}]) $，
+			这就确保了在当前 $ \bm{\theta} $ 下界是下确界。
+			
+			不妨取 $ Q_i(z^{(i)}) \propto p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta}) $，又由 $ \sum_{z^{(i)}} Q_i(z^{(i)}) = 1 $ 知，
+			\begin{align*}
+				Q_i(z^{(i)}) &= \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{\sum_z p(\bm{x}^{(i)}, z; \bm{\theta})} \\
+				&= p(z^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \label{eq:em-algo-posterior} \numberthis
+			\end{align*}
+			综上，只需取 $ Q_i $ 为后验概率 \eqref{eq:em-algo-posterior} 即可。
+		
+		\subsection{summary}
+			根据 \eqref{eq:em-algo-lower-bound} 和 \eqref{eq:em-algo-posterior}。EM 算法为：
+			
+			迭代直到收敛：
+			\begin{align}
+				\text{(E-step)} \qquad\qquad\qquad\qquad& \\
+				 \forall i, \quad Q_i(z^{(i)}) &= p(z^{(i)} | \bm{x}^{(i)}; \bm{\theta}) \\
+				\text{(M-step)} \qquad\qquad\qquad\qquad& \\
+				 \bm{\theta} &= \argmax_{\bm{\theta}} \sum_i \sum_{z^{(i)}} Q_i(z^{(i)}) \log \frac{p(\bm{x}^{(i)}, z^{(i)}; \bm{\theta})}{Q_i(z^{(i)})}
+			\end{align}
