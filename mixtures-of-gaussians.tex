@@ -1,0 +1,37 @@
+\chapter{Mixtures of Gaussians}
+	假设对数据集进行 unsupervised learning，要求得到一个近似的概率分布。
+	很难用一个简单的分布去拟合。高斯混合分布的思路是，假设数据集是由若干个高斯分布合成的，
+	每个样本在产生时，先由一个隐含的多项分布决定属于哪个高斯分布，再由这个高斯分布产生样本。
+	
+	具体地，假设 $ z^{(i)} \sim \text{Multinomial}(\bm{\phi}), \quad \bm{x}^{(i)} | z^{(i)} \sim \mathcal{N}(\bm{\mu}_j, \bm{\Sigma}_j) $
+	其中 $ z^{(i)} \in \{ 1, 2, \ldots, k \} $ 是隐含的随机变量，对应 $ k $ 个高斯分布。
+	$ \bm{x} $ 的 log likelihood 为\footnote{只关心 $ \bm{x} $ 的 likelihood，因为我们无法观测到 $ z $ 的情况}：
+	\begin{align}
+		l(\bm{\phi}, \bm{\mu}, \bm{\Sigma}) &= \sum_{i=1}^{m} \log p(\bm{x}^{(i)}; \bm{\phi}, \bm{\mu}, \bm{\Sigma}) \\
+		&= \sum_{i=1}^{m} \log \sum_{z^{(i)} = 1}^{k} p(\bm{x}^{(i)} | z^{(i)}; \bm{\mu}, \bm{\Sigma}) p(z^{(i)}; \bm{\phi})
+	\end{align}
+	
+	关于 log likelihood，注意两点：
+	\begin{itemize}
+		\item 无法求出各参数的解析解
+		\item 若已知 $ z $，则 $ l $ 的形式与 GDA 中相似
+	\end{itemize}
+
+	\section{EM Algorithm}
+		EM 算法有两步：E-step 和 M-step，迭代直到收敛。
+		
+		E-step:
+		\begin{align}
+			\forall i, j, \quad w_j^{(i)} &= p(z^{(i)} = j | \bm{x}^{(i)}) \\ 
+			&= \frac{p(\bm{x}^{(i)} | z^{(i)} = j) p(z^{(i)}=j)}{\sum_{l=1}^{k} p(\bm{x}^{(i)} | z^{(i)} = l) p(z^{(i)}=l)} \\
+			&= \frac{1}{c} \frac{1}{\sqrt{| \bm{\Sigma_j} |}} \exp \left( - \frac{1}{2} (\bm{x}^{(i)} - \bm{\mu}_j)^\intercal \bm{\Sigma_j}^{-1} (\bm{x}^{(i)} - \bm{\mu}_j)  \right) \phi_j
+		\end{align}
+		M-step:
+		\begin{align}
+			\phi_j &= \frac{1}{m} \sum_{i=1}^{m} w_j^{(i)} \\
+			\bm{\mu}_j &= \frac{\sum_{i=1}^{m} w_j^{(i)} \bm{x}^{(i)}} {\sum_{i=1}^{m} w_j^{(i)}} \\
+			\bm{\Sigma_j} &= \frac{\sum_{i=1}^{m} w_j^{(i)} (\bm{x}^{(i)} - \bm{\mu}_j)(\bm{x}^{(i)} - \bm{\mu}_j)^\intercal} {\sum_{i=1}^{m} w_j^{(i)}}
+		\end{align}
+		其中，$ w_j^{(i)} $ 是 “$ \bm{x}^{(i)} $ 属于第 $ j $ 个高斯分布” 的后验概率。
+
+	
