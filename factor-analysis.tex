@@ -1,0 +1,133 @@
+\chapter{Factor Analysis}
+	之前的 mixtures of Gaussian 适用于 $ m > n $ 的情况。
+	而当 $ m \ll n $ 时，即使只用一个 Gaussian distribution 去拟合，得到的 $ \bm{\Sigma} $ 也是奇异矩阵
+	\footnote{因为 $ m \ll n $，所以 $ \{ \bm{x}^{(1)}, \ldots, \bm{x}^{(m)} \} $ 只能 span 出 $ \mathbb{R}^n $ 的一个维度很小的 subspace }。
+	
+	一种思路是，对 $ \bm{\Sigma} $ 进行一定的限制，强行使 $ \bm{\Sigma} $ 对角化。但这样会丢失各个特征之间的联系，效果并不好。
+	另一种思路是，假设高维的样本 $ \bm{x}^{(i)} \in \mathbb{R}^n $ 由某低维数据 $ \bm{z}^{(i)} \in \mathbb{R}^k $ 仿射得到。
+	
+	\section{Marginals \& Conditionals Of Gaussians}
+		假设
+		\footnote{其中 $ \bm{x}_1 \in \mathbb{R}^r, \bm{x}_2 \in \mathbb{R}^s; \quad \bm{\mu}_1 \in \mathbb{R}^r, \bm{\mu}_2 \in \mathbb{R}^s; \quad \bm{\Sigma}_{11} \in \mathbb{R}^{r \times r}, \bm{\Sigma}_{12} \in \mathbb{R}^{r \times s}, \bm{\Sigma}_{21} \in \mathbb{R}^{s \times r}, \bm{\Sigma}_{22} \in \mathbb{R}^{s \times s} $，且 $ \bm{\Sigma}_{12} = \bm{\Sigma}_{21}^\intercal $。}
+		\begin{equation*}
+			\bm{x} = 
+			\begin{bmatrix}
+				\bm{x}_1 \\
+				\bm{x}_2
+			\end{bmatrix}
+			\sim \mathcal{N}(\bm{\mu}, \bm{\Sigma}), \qquad \bm{\mu} = 
+			\begin{bmatrix}
+				\bm{\mu}_1 \\
+				\bm{\mu}_2
+			\end{bmatrix}
+			, \bm{\Sigma} = 
+			\begin{bmatrix}
+				\bm{\Sigma}_{11} & \bm{\Sigma}_{12} \\
+				\bm{\Sigma}_{21} & \bm{\Sigma}_{22} 
+			\end{bmatrix}
+		\end{equation*} 
+		
+		可得 $ \bm{x}_1 \sim \mathcal{N}(\bm{\mu}_1, \bm{\Sigma}_{11}), \quad \bm{x}_1 | \bm{x}_2 \sim \mathcal{N}(\bm{\mu}_{1|2}, \bm{\Sigma}_{1|2}) $，其中 
+		\begin{align}
+			\bm{\mu}_{1|2} &= \bm{\mu}_1 + \bm{\Sigma}_{12} \bm{\Sigma}_{22}^{-1} (\bm{x}_2 - \bm{\mu}_2) \\
+			\bm{\Sigma}_{1|2} &= \bm{\Sigma}_{11} - \bm{\Sigma}_{12} \bm{\Sigma}_{22}^{-1} \bm{\Sigma}_{21}
+		\end{align}
+		
+	\section{The Factor Analysis Model}	
+		假设 
+		\begin{align*}
+			\bm{z} &\sim \mathcal{N}(\bm{0}, \bm{I}) \\
+			\bm{x} &\sim \mathcal{N}(\bm{\mu} + \bm{\Lambda z}, \bm{\Psi})
+		\end{align*}
+		其中 $ \bm{z} \in \mathbb{R}^k $ 是一个低维的隐含随机变量，经过仿射后产生 $ \bm{x} $；$ \bm{\Lambda} \in \mathbb{R}^{n \times k} $；
+		$ \bm{\Psi} \in \mathbb{R}^{n \times n} $ 是一个对角矩阵。
+		
+		一种等价的说法是：
+		\begin{align}
+			\bm{z} &\sim \mathcal{N}(\bm{0}, \bm{I}) \\
+			\bm{\epsilon} &\sim \mathcal{N}(\bm{0}, \bm{\Psi}) \\
+			\bm{x} &= \bm{\mu} + \bm{\Lambda z} + \bm{\epsilon}
+		\end{align}
+		
+		设 
+		\begin{equation*}
+			\begin{bmatrix}
+				\bm{z} \\
+				\bm{x} 
+			\end{bmatrix}
+			\sim \mathcal{N}(\bm{\mu}_{zx}, \bm{\Sigma})
+		\end{equation*}
+		易知 $ \mathbb{E}[\bm{z}] = 0, \quad \mathbb{E}[\bm{x}] = \mathbb{E}[\bm{\mu} + \bm{\Lambda z} + \bm{\epsilon}] = \bm{\mu} $，所以
+		\begin{equation*}
+			\bm{\mu}_{zx} = 
+			\begin{bmatrix}
+				\bm{0} \\
+				\bm{\mu}
+			\end{bmatrix}
+		\end{equation*}
+		又设
+		\begin{align*}
+			\bm{\Sigma} &= \mathbb{E} 
+			\left[  
+				\left( 
+					\begin{bmatrix}
+						\bm{z} \\
+						\bm{x}
+					\end{bmatrix}
+					- \mathbb{E} 
+					\begin{bmatrix}
+						\bm{z} \\
+						\bm{x}
+					\end{bmatrix}
+				\right)
+				\left( 
+					\begin{bmatrix}
+						\bm{z} \\
+						\bm{x}
+					\end{bmatrix}
+					- \mathbb{E} 
+					\begin{bmatrix}
+						\bm{z} \\
+						\bm{x}
+					\end{bmatrix}
+				\right)^\intercal
+			\right] \\
+			&= \begin{bmatrix}
+				\mathbb{E}\left[ (\bm{z} - \mathbb{E}\bm{z}) (\bm{z} - \mathbb{E}\bm{z})^\intercal \right]  & \mathbb{E}\left[ (\bm{z} - \mathbb{E}\bm{z}) (\bm{x} - \mathbb{E}\bm{x})^\intercal \right] \\
+				\mathbb{E}\left[ (\bm{x} - \mathbb{E}\bm{x}) (\bm{z} - \mathbb{E}\bm{z})^\intercal \right] & \mathbb{E}\left[ (\bm{x} - \mathbb{E}\bm{x}) (\bm{x} - \mathbb{E}\bm{x})^\intercal \right]
+			\end{bmatrix} \\
+			&= \begin{bmatrix}
+				\bm{\Sigma}_{zz} & \bm{\Sigma}_{zx} \\
+				\bm{\Sigma}_{xz} & \bm{\Sigma}_{xx}
+			\end{bmatrix}
+		\end{align*}
+		其中 
+		\begin{align*}
+			\bm{\Sigma}_{zz} &= \bm{I} \\
+			\bm{\Sigma}_{zx} &= \mathbb{E}[\bm{z} \cdot (\bm{\mu} + \bm{\Lambda z} + \bm{\epsilon} - \bm{\mu})] \\
+			&= \mathbb{E}[ \bm{z}(\bm{\Lambda z})^\intercal + \bm{z}\bm{\epsilon}^\intercal ] \\
+			&= \mathbb{E}[\bm{z z}^\intercal] \bm{\Lambda}^\intercal + \mathbb{E}[\bm{z}] \mathbb{E}[\bm{\epsilon}]^\intercal \\
+			&= \bm{\Lambda}^\intercal \\
+			\bm{\Sigma}_{xz} &= \bm{\Sigma}_{zx}^\intercal \\
+			&= \bm{\Lambda} \\
+			\bm{\Sigma}_{xx} &= \mathbb{E}[(\bm{\mu} + \bm{\Lambda z} + \bm{\epsilon} - \bm{\mu}) (\bm{\mu} + \bm{\Lambda z} + \bm{\epsilon} - \bm{\mu})^\intercal] \\
+			&= \bm{\Lambda} \bm{\Lambda}^\intercal + \bm{\Psi}
+		\end{align*}
+		
+		综上所述，
+		\begin{equation}
+			\begin{bmatrix}
+				\bm{z} \\
+				\bm{x}
+			\end{bmatrix} 
+			\sim \mathcal{N}\left( 
+			\begin{bmatrix}
+				\bm{0} \\
+				\bm{\mu}
+			\end{bmatrix}, 
+			\begin{bmatrix}
+				\bm{I} & \bm{\Lambda}^\intercal \\
+				\bm{\Lambda} & \bm{\Lambda} \bm{\Lambda}^\intercal + \bm{\Psi}
+			\end{bmatrix}
+			\right)
+		\end{equation}
