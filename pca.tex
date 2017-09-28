@@ -1,0 +1,42 @@
+\chapter{Principal Components Analysis}
+	PCA 是一种压缩数据维度的方法。假设原样本维度很高 （例如 $ 10,000 $ 维），其中有很多的特征是不必要的、线性相关的
+	\footnote{例如一个特征是以英尺为单位的长度，另一个特征是以米为单位的长度}
+	，这些不必要的数据不仅增加了计算成本，还引入了噪音
+	\footnote{例如在单位转换时的舍入误差}
+	。我们的想法是，既然有很多不必要的特征，那么数据集很可能集中分布在原空间的一个低维子空间中。
+	如果将样本降维到这个子空间，那么不仅能减少计算成本，还能消除噪音。
+	
+	\section{Pre-processing}
+		一般，在进行 PCA 之前，我们会对数据集进行预处理。
+		\begin{enumerate}
+			\item 计算均值 $ \bm{\mu} = \frac{1}{m} \sum_{i=1}^{m} \bm{x}^{(i)} $
+			\item 令 $ \bm{x}^{(i)} = \bm{x}^{(i)} - \bm{\mu} $
+			\item 计算每个特征上的样本方差 $ \sigma_j^2 = \frac{1}{m} \sum_{i=1}^{m} \left( \bm{x}_j^{(i)} \right)^2 $
+			\item 令 $ x_j^{(i)} = x_j^{(i)} / \sigma_j  $
+		\end{enumerate}
+		前两步是为了使样本均值为 $ 0 $ (zero out the mean)，后两步是对各个维度上的特征 normalizing，使各个特征的数量级大致相同。
+	
+	\section{Reducing To 1-dim Subspace}
+		假设我们要把样本降维到 $ 1 $ 维子空间中，这个子空间由单位向量 $ \bm{u} \in \mathbb{R}^n $ 张成。
+		如果将样本投射到子空间后，所有的样本都汇聚到一起，那么我们认为这个子空间并不合适。
+		换言之，我们希望 $ \{ {\bm{x}^{(1)}}^\intercal \bm{u}, \ldots, {\bm{x}^{(m)}}^\intercal \bm{u} \} $ 的方差最大。
+		由于预处理后，样本均值为 $ \bm{0} $，所以最大化的目标函数为：
+		\begin{align*}
+			\sum_i \left( {\bm{x}^{(i)}}^\intercal \bm{u} - \mathbb{E} \left[ {\bm{x}^{(i)}}^\intercal \bm{u} \right] \right)^2 &= \sum_i \left( {\bm{x}^{(i)}}^\intercal \bm{u} \right)^2 \\
+			&= \bm{u}^\intercal \left(\sum_i \bm{x}^{(i)} {\bm{x}^{(i)}}^\intercal \right) \bm{u} \\
+			&= \bm{u}^\intercal \bm{X}^\intercal \bm{Xu}
+		\end{align*}
+		
+		记 $ \bm{\Sigma} = \bm{X}^\intercal \bm{X} $，则我们要求解优化问题
+		\begin{align}
+			\max_{\bm{u}} \quad & \bm{u}^\intercal \bm{\Sigma} \bm{u} \\
+			\st & \| \bm{u} \|_2^2 = 1
+		\end{align}
+		由 \eqref{kkt1} 知，$ \bm{u} $ 必为 $ \bm{\Sigma} $ 的一个特征向量。设与之对应的特征值为 $ \lambda $，则代入目标函数得到 $ \bm{u}^\intercal \bm{\Sigma} \bm{u} = \lambda \| \bm{u} \|_2^2 = \lambda $。
+		
+		综上所述，$ \bm{u} $ 为 $ \bm{\Sigma} $ 的主特征向量（principal eigenvector，即对应最大特征值的特征向量）。
+		
+	\section{Reducing To n-dim Subspace}
+		同理可证，要降维到由单位向量 $ \{ \bm{u}_1, \ldots, \bm{u}_k \} $ 张成的 $ k $ 维子空间，
+		则这 $ k $ 个单位向量是对应于 $ \bm{\Sigma} $ 的 $ k $ 个最大特征值的特征向量，
+		被称为数据集的 “主成分(principal components)”。
