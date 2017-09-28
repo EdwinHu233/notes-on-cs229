@@ -37,6 +37,19 @@
 		综上所述，$ \bm{u} $ 为 $ \bm{\Sigma} $ 的主特征向量（principal eigenvector，即对应最大特征值的特征向量）。
 		
 	\section{Reducing To n-dim Subspace}
-		同理可证，要降维到由单位向量 $ \{ \bm{u}_1, \ldots, \bm{u}_k \} $ 张成的 $ k $ 维子空间，
+		更一般地，要降维到由单位向量 $ \{ \bm{u}_1, \ldots, \bm{u}_k \} $ 张成的 $ k $ 维子空间，
 		则这 $ k $ 个单位向量是对应于 $ \bm{\Sigma} $ 的 $ k $ 个最大特征值的特征向量，
-		被称为数据集的 “主成分(principal components)”。
+		被称为数据集的 “主成分(principal components)”。降维后的数据为：
+		\begin{equation}
+			\bm{y}^{(i)} = 
+			\begin{bmatrix}
+				\bm{u}_1^\intercal \\
+				\vdots \\
+				\bm{u}_k^\intercal
+			\end{bmatrix} \cdot \bm{x}^{(i)} \\
+			= \begin{bmatrix}
+				\bm{u}_1^\intercal \bm{x}^{(i)} \\
+				\vdots \\
+				\bm{u}_k^\intercal \bm{x}^{(i)}
+			\end{bmatrix} \in \mathbb{R}^k
+		\end{equation}
