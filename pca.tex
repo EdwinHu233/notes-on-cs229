@@ -53,3 +53,32 @@
 				\bm{u}_k^\intercal \bm{x}^{(i)}
 			\end{bmatrix} \in \mathbb{R}^k
 		\end{equation}
+		
+	\section{SVD \& PCA}
+		SVD 是一种机器学习中常用的分解矩阵的方法。
+		\begin{equation}
+			\begin{bmatrix}
+				\bm{A} \\
+				m \times n
+			\end{bmatrix} 
+			= 
+			\begin{bmatrix}
+				\bm{U} \\
+				m \times m
+			\end{bmatrix}
+			\begin{bmatrix}
+				\bm{D} \\
+				m \times n
+			\end{bmatrix}
+			\begin{bmatrix}
+				\bm{V}^\intercal \\
+				n \times n
+			\end{bmatrix}
+		\end{equation}
+		其中 $ \bm{U} $ 的列向量是 $ \bm{AA}^\intercal $ 的特征向量，$ \bm{V} $ 的列向量是 $ \bm{A}^\intercal \bm{A} $ 的特征向量，$ \bm{D} $ 是一个近似的对角矩阵，其 “对角线” 上元素是 $ \bm{AA}^\intercal $ 的特征值
+		\footnote{当然也是 $ \bm{A}^\intercal \bm{A} $ 的特征值}。
+		$ \bm{U} $ 与 $ \bm{V} $ 的列向量与 $ \bm{D} $ “对角线” 上的元素一一对应，并且一般 $ \bm{D} $ 的 “对角线” 元素由大到小依次排列
+		\footnote{例如在 numpy.linalg.svd 中就是如此}。
+		
+		因此，只需对 $ \bm{X} $ 进行 SVD，取 $ \bm{V} $ 的前 $ k $ 个向量并做单位正交化即可
+		\footnote{numpy.linalg.svd 函数已经做好了单位正交化}。
