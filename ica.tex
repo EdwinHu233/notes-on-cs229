@@ -1,0 +1,31 @@
+\chapter{Independent Components Analysis}
+	ICA 是一种对混合信息进行分解、恢复原信息的算法。
+	设想这样的情景：在嘈杂的聚会上，有 $ n $ 个说话的人，以及 $ n $ 个话筒。
+	在第 $ i $ 个时间戳时，声源为 $ \bm{s}^{(i)} \in \mathbb{R}^n $，话筒收集的信息为 $ \bm{x}^{(i)} \in \mathbb{R}^n $。
+	假设二者的关系是线性的，即存在一个 mixing matrix $ \bm{A} \in \mathbb{R}^{n \times n} $
+	\begin{equation}
+		\bm{x}^{(i)} = \bm{A} \bm{s}^{(i)} , \quad \forall i
+	\end{equation}
+	
+	再设
+	\begin{align*}
+		\bm{W} &= \bm{A}^{-1} \\
+		&= 
+		\begin{bmatrix}
+			w_1^\intercal \\
+			\vdots \\
+			w_n^\intercal
+		\end{bmatrix} \\
+		&\in \mathbb{R}^{n \times n}
+	\end{align*}
+	则 $ \bm{s}^{(i)} = \bm{W} \bm{x}^{(i)} $。我们的目标就是求出这个 unmixing matrix $ \bm{W} $。
+	
+	\section{Ambiguities}
+		我们只知道 $ \bm{x} $，而要解出 $ \bm{W}, \bm{s} $。出于以下几种原因，可行解不是唯一的。
+		
+		一是，考虑一种可行解 $ \bm{A}, \bm{s} $ 使得 $ \bm{x} = \bm{As} $。设 $ \bm{P} $ 是一个置换矩阵，$ (\bm{AP}) \cdot (\bm{P}^\intercal \bm{s}) = \bm{As} = \bm{x} $，所以 $ \bm{P}' = \bm{AP}, \bm{s}' = \bm{P}^\intercal \bm{s} $ 也是可行解。多数情况下，这种 ambiguity 无关紧要。
+		
+		二是，考虑一种可行解 $ \bm{A}, \bm{s} $ 使得 $ \bm{x} = \bm{As} $。显然 $ \bm{P}' = \alpha \bm{P}, \bm{s}' = \frac{1}{\alpha} \bm{s} $ 也是可行解。多数情况下，这种 ambiguity 无关紧要。
+		
+		如果 $ \bm{s} $ 不是高斯分布的，那么只有以上两种无关紧要的 ambiguities。但是，假设 $ \bm{s} \sim \mathcal{N}(\bm{0}, \bm{I}) $，那么
+		$ \mathbb{E}[\bm{x}] = \mathbb{E}[\bm{As}] = \bm{0}, \mathbb{E}[\bm{xx}^\intercal] = \mathbb{E}[\bm{Ass}^\intercal\bm{A}^\intercal] = \bm{AA}^\intercal $，所以 $ \bm{x} \sim \mathcal{N}(\bm{0}, \bm{AA}^\intercal) $。
